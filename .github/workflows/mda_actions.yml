@@ -8,8 +8,12 @@ env:
   USER_SERVER: ubuntu
   REPOSITORY_NAME: mda
   REPOSITORY_NAME_LC: mda
-  PACKAGE_NAME: mda_testing
-  IMAGE_NAME: mda_test
+  PACKAGE_MDA_NAME: mda_testing
+  IMAGE_MDA_NAME: mda_test
+  PACKAGE_OSM_NAME: osm_testing
+  IMAGE_OSM_NAME: osm_test
+  PACKAGE_VS_NAME: vs_testing
+  IMAGE_VS_NAME: vs_test
 
 jobs:
   test:
@@ -31,8 +35,12 @@ jobs:
       
       - name: Build image
         run: |
-         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA
-         docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }} .
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA/dummy_mda_connector
+         docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }} .
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA/dummy_osm_connector
+         docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }} .
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA/dummy_vs_connector
+         docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }} .
       
       - name: Read VERSION file
         id: getversion
@@ -46,8 +54,13 @@ jobs:
       - name: Publish image
         run: |
           docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
-          docker tag docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:latest docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:${{ steps.getversion.outputs.version }}
-          docker push docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}
+          docker tag docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }}:latest docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }}:${{ steps.getversion.outputs.version }}
+          docker push docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }}
+          docker tag docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }}:latest docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }}:${{ steps.getversion.outputs.version }}
+          docker push docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }}
+          docker tag docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }}:latest docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }}:${{ steps.getversion.outputs.version }}
+          docker push docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }}
+          
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -60,13 +73,13 @@ jobs:
           body: |
             ${{ github.event.head_commit.message }}
       
-      - name: stop container
-        continue-on-error: true
-        run: docker stop ${{ env.IMAGE_NAME }}
+      #- name: stop container
+      #  continue-on-error: true
+      #  run: docker stop ${{ env.IMAGE_NAME }}
         
-      - name: remove images
-        continue-on-error: true
-        run: docker rmi $(docker images -q docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.GATEWAY_NAME }}) --force
+      #- name: remove images
+      #  continue-on-error: true
+      #  run: docker rmi $(docker images -q docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.GATEWAY_NAME }}) --force
       
       #- name: pull package
       #  run: docker pull docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:latest
