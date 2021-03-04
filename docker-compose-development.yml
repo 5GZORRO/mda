@@ -1,0 +1,56 @@
+version: '2'
+services:
+  vs:
+    image: docker.pkg.github.com/5gzorro/mda/vs_testing:latest
+    ports:
+      - "3700:3700"
+    expose:
+      - "3700"
+    depends_on:
+      - mda
+    links:
+      - "mda"
+  mda:
+    image: docker.pkg.github.com/5gzorro/mda/mda_testing:latest
+    ports:
+      - "4000:4000"
+    expose:
+      - "4000"
+    environment:
+      OPERATOR_PUBLIC_KEY: ${OPERATOR_PUBLIC_KEY}
+    depends_on:
+      - kafka
+    links:
+      - "kafka"      
+  osm:
+    image: docker.pkg.github.com/5gzorro/mda/osm_testing:latest
+    ports:
+      - "4500:4500"
+    expose:
+      - "4500"
+    depends_on:
+      - vs
+      - mda
+    links:
+      - "vs"
+      - "mda"
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "topic_test:1:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
