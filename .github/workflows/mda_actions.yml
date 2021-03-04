@@ -37,9 +37,9 @@ jobs:
         run: |
          cd dummy_mda_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }} .
-         cd dummy_osm_connector
+         cd ../dummy_osm_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }} .
-         cd dummy_vs_connector
+         cd ../dummy_vs_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }} .
       
       - name: Read VERSION file
