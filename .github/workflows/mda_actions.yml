@@ -1,0 +1,106 @@
+name: Test Environment
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  USER_SERVER: ubuntu
+  REPOSITORY_NAME: virtual-resource-manager
+  REPOSITORY_NAME_LC: virtual-resource-manager
+  PACKAGE_NAME: mda
+  IMAGE_NAME: myfastapi
+
+jobs:
+  test:
+    
+    runs-on: vrm-runner
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: create old_versions folder if it does not exists
+        continue-on-error: true
+        run: |
+          mkdir /home/${{ env.USER_SERVER }}/old_versions
+      - name: create adapter's folder in old_versions folder if it does not exists
+        continue-on-error: true
+        run: |
+          mkdir /home/${{ env.USER_SERVER }}/old_versions/${{ env.REPOSITORY_NAME }}
+      - name: moving project to older_versions folder
+        run: |
+          mv /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME }} "/home/${{ env.USER_SERVER }}/old_versions/${{ env.REPOSITORY_NAME }}/${{ env.PACKAGE_NAME }}_$(date '+%Y%m%d%H%M%S')"
+      - name: clone repository
+        run: |
+          cd /home/${{ env.USER_SERVER }}
+          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/5GZORRO/${{ env.REPOSITORY_NAME }}.git
+      
+      - name: delete old project
+        run: |
+          python /home/${{ env.USER_SERVER }}/continuous/delete_old_versions.py ${{ env.USER_SERVER }} ${{ env.REPOSITORY_NAME }}
+      
+      #- name: decrypt env file
+      #  run: |
+      #    cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME }}
+      #    gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ENV_PASSWORD }}" --output .env .env_test.gpg
+      
+      - name: Build image
+        run: |
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA
+         docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }} .
+      
+      - name: Read VERSION file
+        id: getversion
+        run: echo "::set-output name=version::$(cat VERSION)"
+      
+      - uses: actions/delete-package-versions@v1
+        continue-on-error: true
+        with:
+          package-name: ${{ env.PACKAGE_NAME }}
+      
+      - name: Publish image
+        run: |
+          docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
+          docker tag docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:latest docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:${{ steps.getversion.outputs.version }}
+          docker push docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.getversion.outputs.version }}
+          release_name: ${{ steps.getversion.outputs.version }}
+          body: |
+            ${{ github.event.head_commit.message }}
+      
+      - name: stop container
+        continue-on-error: true
+        run: docker stop ${{ env.IMAGE_NAME }}
+        
+      - name: remove images
+        continue-on-error: true
+        run: docker rmi $(docker images -q docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.GATEWAY_NAME }}) --force
+      
+      - name: pull package
+        run: docker pull docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:latest
+
+      - name: running container
+        run: docker run -d --rm --name ${{ env.IMAGE_NAME }} -e "${{ secrets.OPERATOR_PUBLIC_KEY }}" -p 5000:5000 docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_NAME }}:latest
+        
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
