@@ -24,9 +24,9 @@ jobs:
       - uses: actions/checkout@v2
       
       #- name: clone repository
-      # run: |
+      #  run: |
       #    cd /home/${{ env.USER_SERVER }}
-      #   git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/5GZORRO/${{ env.REPOSITORY_NAME }}.git
+      #    git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/5GZORRO/${{ env.REPOSITORY_NAME }}.git
       
       #- name: decrypt env file
       #  run: |
@@ -35,11 +35,11 @@ jobs:
       
       - name: Build image
         run: |
-         cd /dummy_mda_connector
+         cd dummy_mda_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }} .
-         cd /dummy_osm_connector
+         cd dummy_osm_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }} .
-         cd /dummy_vs_connector
+         cd dummy_vs_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }} .
       
       - name: Read VERSION file
