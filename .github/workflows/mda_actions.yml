@@ -35,11 +35,11 @@ jobs:
       
       - name: Build image
         run: |
-         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA/dummy_mda_connector
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/dummy_mda_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }} .
-         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA/dummy_osm_connector
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/dummy_osm_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }} .
-         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/MDA/dummy_vs_connector
+         cd /home/${{ env.USER_SERVER }}/${{ env.REPOSITORY_NAME_LC }}/dummy_vs_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_VS_NAME }} .
       
       - name: Read VERSION file
