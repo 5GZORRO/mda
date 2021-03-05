@@ -4,7 +4,20 @@
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # mda
-5GZORRO's Monitoring Data Aggregator component
+This is the 5GZORRO's Monitoring Data Aggregator component responsible for collecting, sign and push monitoring data, provided by each Resource and Service Provider, towards the Data Lake. As monitoring data is presented over time, it can also be aggregated and made available in a proper manner to perform the desired analytics.
+
+## Production
+This section will be available later on.
+
+## Development
+
+### Pipeline Description
+
+### Supported Endpoints
+
+### NBI MDA
+
+### Deployment Instructions
 
 ## Licensing
 
