@@ -27,6 +27,30 @@ Kafka Topics|`kafka:9092`|**Accepts metrics data for topic**| KafkaProducer
 ### NBI MDA
 
 ### Deployment Instructions
+This section covers all the needs a developer to get deployment of the development cenary.
+
+#### Prerequisites
+For sign the metrics data we need a public key, so in this cenary we config this key in an environment variable.
+```
+$ export OPERATOR_PUBLIC_KEY=<PUBLIC_KEY>
+```
+#### Deploy components
+The components configuration has in docker compose, so we need to build and up this compose. How we use a private packages, we need to login in docker for get permitions for this.
+
+So, for to login in docker we has:
+```
+$ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
+```
+ * **Note:** If you want to use the personal access token and don´t has, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+
+Then, for build and up the docker compose we has:
+```
+$ docker-compose -f docker-compose-development.yml up --build
+```
+ * **Note:** If you want to deploy only one component, you can use:
+```
+$ docker-compose -f docker-compose-development.yml up --build <component_name>
+```
 
 ## Licensing
 
