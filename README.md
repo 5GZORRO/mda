@@ -19,7 +19,7 @@ The following table presents the list of endpoints used in development cenary.
 **Component**|**Endpoint**|**Description**|**Method**
 :----|:----|:----|:----
 Vertical Slicer|`<IP>:3700/sendConfig`|**Send the settings** for get data from OSM and send to Kafka Topics| POST
-MDA|`<IP>:4000/set/`|**Accepts the settings** for get data from OSM and send to Kafka Topics| POST
+MDA|`<IP>:4000/set`|**Accepts the settings** for get data from OSM and send to Kafka Topics| POST
 MDA|`<IP>:4000/dummyData`|**Get data** from OSM and send to Kafka Topics| GET
 OSM|`<IP>:4500/dummyData`|**Send metrics data by timeline** requested by MDA| GET
 Kafka Topics|`kafka:9092`|**Accepts metrics data for topic**| KafkaProducer
