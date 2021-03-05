@@ -5,3 +5,11 @@
 
 # mda
 5GZORRO's Monitoring Data Aggregator component
+
+## Licensing
+
+This 5GZORRO component is published under Apache 2.0 license. Please see the LICENSE file for further details.
+
+## Attributions
+
+<img src="https://www.5gzorro.eu/wp-content/uploads/2019/11/5GZorro-D12-1024x539-copia.png" width="200" />
