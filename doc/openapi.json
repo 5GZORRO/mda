@@ -1,0 +1,140 @@
+{
+	"openapi":"3.0.2",
+	"info": {
+		"title":"FastAPI",
+		"version":"0.1.0"
+	},
+	"paths": {
+		"/set/": {
+			"post": {
+				"summary":"Set Param",
+				"operationId":"set_param_set__post",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref":"#/components/schemas/Data"
+							}
+						}
+					},
+				"required":true
+				},
+				"responses": {
+					"200": {
+						"description":"Successful Response",
+						"content": {
+							"application/json": {
+								"schema":{}
+							}
+						}
+					},
+					"422": {
+						"description":"Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref":"#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dummyData": {
+			"get": {
+				"summary":"Root",
+				"operationId":"root_dummyData_get",
+				"responses": {
+					"200": {
+						"description":"Successful Response",
+						"content": {
+							"application/json": {
+								"schema":{}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Data": {
+				"title":"Data",
+				"required": [
+					"businessID","topic","sliceID","metrics","timestamp"
+				],
+				"type":"object",
+				"properties": {
+					"businessID": {
+						"title":"Businessid",
+						"type":"string"
+					},
+					"topic": {
+						"title":"Topic",
+						"type":"string"
+					},
+					"sliceID": {
+						"title":"Sliceid",
+						"type":"integer"
+					},
+					"metrics": {
+						"title":"Metrics",
+						"type":"array",
+						"items":{}
+					},
+					"timestamp": {
+						"title":"Timestamp",
+						"type":"string"
+					},
+					"timestamp_final": {
+						"title":"Timestamp Final",
+						"type":"string"
+					},
+					"step": {
+						"title":"Step",
+						"type":"string"
+					}
+				}
+			},
+			"HTTPValidationError": {
+				"title":"HTTPValidationError",
+				"type":"object",
+				"properties": {
+					"detail": {
+						"title":"Detail",
+						"type":"array",
+						"items": {
+							"$ref":"#/components/schemas/ValidationError"
+						}
+					}
+				}
+			},
+			"ValidationError": {
+				"title":"ValidationError",
+				"required": [
+					"loc","msg","type"
+				],
+				"type":"object",
+				"properties": {
+					"loc": {
+						"title":"Location",
+						"type":"array",
+						"items": {
+							"type":"string"
+						}
+					},
+					"msg": {
+						"title":"Message",
+						"type":"string"
+					},
+					"type": {
+						"title":"Error Type",
+						"type":"string"
+					}
+				}
+			}
+		}
+	}
+}
