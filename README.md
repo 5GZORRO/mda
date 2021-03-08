@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # mda
-This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for collecting, sign and push monitoring data, provided by each Resource and Service Provider, towards the Data Lake. As monitoring data is presented over time, it can also be aggregated and made available in a proper manner to perform the desired analytics.
+This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for collecting, signing and pushing monitoring data, provided by each Resource and Service Provider, towards the Data Lake. As monitoring data is presented over time, it can also be aggregated and made available in a proper manner to perform the desired analytics.
 
 ## Production
 This section will be available later on. For now, we tender a confluence page available online describing the intended full pipeline (steps and parameters skeleton). Consult it [here](https://confluence.i2cat.net/pages/viewpage.action?spaceKey=5GP&title=Monitoring+Data+Aggregator+Pipeline)
