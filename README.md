@@ -7,11 +7,13 @@
 This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for collecting, sign and push monitoring data, provided by each Resource and Service Provider, towards the Data Lake. As monitoring data is presented over time, it can also be aggregated and made available in a proper manner to perform the desired analytics.
 
 ## Production
-This section will be available later on.
+This section will be available later on. For now, we tender a confluence page available online describing the intended full pipeline (steps and parameters skeleton). Consult it [here](https://confluence.i2cat.net/pages/viewpage.action?spaceKey=5GP&title=Monitoring+Data+Aggregator+Pipeline)
 
 ## Development
 
 ### Pipeline Description
+
+For the development stage, at this point, our focus has been on implementing a primary version of this component including on the pipeline a dummy OSM, a dummy VS, and a dummy component that interacts with a python client responsible to produce data and redirect to the respective dummy Kafka topic.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/32877599/110141979-96668180-7dcd-11eb-85f8-c0c066a34ab1.png" />
@@ -48,9 +50,9 @@ The components configuration is built in a docker-compose. Since we are handling
 ```
 $ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
 ```
- * **Note:** If you want to use the personal access token and don´t has, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+ * **Note:** If it is required to utilize the personal access token and you do not possess that feature, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
-Then, for build and up the docker compose we has:
+Then, for build and up the docker compose we have:
 ```
 $ docker-compose -f docker-compose-development.yml up --build
 ```
@@ -60,6 +62,8 @@ $ docker-compose -f docker-compose-development.yml up --build <component_name>
 ```
 
 ## API Reference
+
+We have specified this component's API in an openapi-formated file. Please check it there.
 
 ## Licensing
 
