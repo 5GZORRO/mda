@@ -21,7 +21,7 @@ For the development stage, at this point, our focus has been on implementing a p
 
 Currently, our pipeline is composed of five main steps, each one held for:
 1. VS sends to MDA a __configuration__ with dynamic variables specifying the monitored metrics 
-2. MDA fetches from OSM the __metric values__ item 2
+2. MDA fetches from OSM the __metric values__ 
 3. Metric __aggregation__, via Prometheus python client
 4. __Hash/signing__ data with operator's key making use of SHA256 and RSA algorithms
 5. __Inject__ data into a DL Kafka Topic
@@ -31,11 +31,10 @@ The following table displays the endpoints used in the development scenario:
 
 **Component**|**Endpoint**|**Description**|**Method**
 :----|:----|:----|:----
-Vertical Slicer|`http://<IP>:3700/sendConfig`|**Send the settings** for get data from OSM and send to Kafka Topics| POST
-MDA|`http://mda:4000/set`|**Accepts the settings** for get data from OSM and send to Kafka Topics| POST
-MDA|`http://<IP>:4000/dummyData`|**Get data** from OSM and send to Kafka Topics| GET
-OSM|`http://osm:4500/dummyData`|**Send metrics data by timeline** requested by MDA| GET
-Kafka Topics|`kafka:9092`|**Accepts metrics data for topic**| KafkaProducer
+MDA|`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
+MDA|`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
+MDA|`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
+MDA|`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
 
 ### Deployment Instructions
 This section covers all the needs a developer has to get deployment of the development scenario.
