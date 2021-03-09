@@ -16,14 +16,14 @@ This section will be available later on. For now, we tender a confluence page av
 For the development stage, at this point, our focus has been on implementing a primary version of this component including on the pipeline a dummy OSM, a dummy VS, and a dummy component that interacts with a python client responsible to produce data and redirect to the respective dummy Kafka topic.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/32877599/110141979-96668180-7dcd-11eb-85f8-c0c066a34ab1.png" />
+  <img src="https://user-images.githubusercontent.com/32877599/110475056-4ee73a80-80d8-11eb-9756-b82e3c162688.png" />
 </p>
 
 Currently, our pipeline is composed of five main steps, each one held for:
 1. VS sends to MDA a __configuration__ with dynamic variables specifying the monitored metrics 
 2. MDA fetches from OSM the __metric values__ item 2
 3. Metric __aggregation__, via Prometheus python client
-4. __Hash/signing__ data with operator's public key making use of SHA256 and RSA algorithms
+4. __Hash/signing__ data with operator's key making use of SHA256 and RSA algorithms
 5. __Inject__ data into a DL Kafka Topic
 
 ### Supported Endpoints
