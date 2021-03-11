@@ -22,7 +22,7 @@ For the development stage, at this point, our focus has been on implementing a p
 Currently, our pipeline is composed of five main steps, each one held for:
 1. VS sends to MDA a __configuration__ with dynamic variables specifying the monitored metrics 
 2. MDA fetches from OSM the __metric values__ 
-3. Metric __aggregation__, via Prometheus python client
+3. Metric __aggregation__, via Prometheus python client (if the case)
 4. __Hash/signing__ data with operator's key making use of SHA256 and RSA algorithms
 5. __Inject__ data into a DL Kafka Topic
 
