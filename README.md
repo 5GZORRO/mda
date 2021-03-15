@@ -16,14 +16,14 @@ This section will be available later on. For now, we tender a confluence page av
 For the development stage, at this point, our focus has been on implementing a primary version of this component including on the pipeline a dummy OSM, a dummy VS, and a dummy component that interacts with a python client responsible to produce data and redirect to the respective dummy Kafka topic.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/32877599/110141979-96668180-7dcd-11eb-85f8-c0c066a34ab1.png" />
+  <img src="https://user-images.githubusercontent.com/32877599/110475056-4ee73a80-80d8-11eb-9756-b82e3c162688.png" />
 </p>
 
 Currently, our pipeline is composed of five main steps, each one held for:
 1. VS sends to MDA a __configuration__ with dynamic variables specifying the monitored metrics 
-2. MDA fetches from OSM the __metric values__ item 2
-3. Metric __aggregation__, via Prometheus python client
-4. __Hash/signing__ data with operator's public key making use of SHA256 and RSA algorithms
+2. MDA fetches from OSM the __metric values__ 
+3. Metric __aggregation__, via Prometheus python client (if the case)
+4. __Hash/signing__ data with operator's key making use of SHA256 and RSA algorithms
 5. __Inject__ data into a DL Kafka Topic
 
 ### Supported Endpoints
@@ -31,11 +31,14 @@ The following table displays the endpoints used in the development scenario:
 
 **Component**|**Endpoint**|**Description**|**Method**
 :----|:----|:----|:----
-Vertical Slicer|`http://<IP>:3700/sendConfig`|**Send the settings** for get data from OSM and send to Kafka Topics| POST
-MDA|`http://mda:4000/set`|**Accepts the settings** for get data from OSM and send to Kafka Topics| POST
-MDA|`http://<IP>:4000/dummyData`|**Get data** from OSM and send to Kafka Topics| GET
-OSM|`http://osm:4500/dummyData`|**Send metrics data by timeline** requested by MDA| GET
-Kafka Topics|`kafka:9092`|**Accepts metrics data for topic**| KafkaProducer
+MDA|`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
+MDA|`http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
+MDA|`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
+MDA|`http://<IP>:4000/settings/:id`|Modify the current monitoring spec|PUT
+MDA|`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
+MDA|`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
+MDA|`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
+
 
 ### Deployment Instructions
 This section covers all the needs a developer has to get deployment of the development scenario.
