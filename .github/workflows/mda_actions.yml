@@ -35,7 +35,7 @@ jobs:
       
       - name: Build image
         run: |
-         cd dummy_mda_connector
+         cd mda
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_MDA_NAME }} .
          cd ../dummy_osm_connector
          docker build -t docker.pkg.github.com/5gzorro/${{ env.REPOSITORY_NAME_LC }}/${{ env.PACKAGE_OSM_NAME }} .
