@@ -24,7 +24,7 @@ services:
     environment:
       OPERATOR_PUBLIC_KEY: ${OPERATOR_PUBLIC_KEY}
       POSTGRES_USER: "postgres"
-      POSTGRES_PW: "postgres"
+      POSTGRES_PW: ${POSTGRES_PW}
       POSTGRES_URL: "172.31.8.183:5432"
       POSTGRES_DB: "mda_test"
     depends_on:

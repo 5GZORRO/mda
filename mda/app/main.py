@@ -109,17 +109,12 @@ def validate_uuid4(uuid_string):
 def request_OSM(request_metric, request_start):
 	endpoint = 'http://osm:4500/monitoringData?'
 	request_url = endpoint + request_metric + request_start
-	print(request_url)
 	response = requests.get(request_url)
-	#print('entra2')
 	if response.status_code != 200:
-		#print('entra')
 		return ('Error in fetching data!', 200)
-	#print(f'Response: {response}')
 	resp = response.text
 	json_data = json.loads(response.text)
 	print(f'Response from OSM: {resp} + operator public key: {publicKeyOperator}')
-	#json_data = {'counter':2}
 
 	payload_encoded = {k: str(v).encode('utf-8') for k,v in json_data.items()}
 	hashData = {k: hashlib.sha256(v).hexdigest() for k,v in payload_encoded.items()}
@@ -158,17 +153,13 @@ def fetch_values(metric_id, metric_name, starttime , timeout, status, step):
 		while((datetime.datetime.now() >= starttime) and (datetime.datetime.now() < timeout) and status==1):
 			print(f'{datetime.datetime.now()} - S1: Fetching values from OSM, metric: {metric_name}, step: {step}')
 			request_OSM(request_metric, request_start)
-			#print('teste aqui')
-			#print(step)
 			time.sleep(convert_to_seconds(step))
-			#time.sleep(10)
 	else:
 		while(status == 1):
 			#print('entraste')
 			print(f'{datetime.datetime.now()} - S2: Fetching values from OSM, metric: {metric_name}, step: {step}')
 			request_OSM(request_metric, request_start)
 			time.sleep(convert_to_seconds(step))
-	print('fim')
 	return f'Done Fetching values of metric: {metric_id} - {metric_name}'
 
 	'''while((datetime.datetime.now() < timeout) and int(status)==1):
@@ -190,10 +181,6 @@ def transform_config(metric_id, metric_name, timestampStart, timestampEnd, statu
 
 def delete_thread(metric_id):
 	global threads
-	print('entra3')
-	print(metric_id)
-	print(threads)
-	print(threads[str(metric_id)])
 	# stop thread and remove from global dict the assign
 	threads[str(metric_id)].kill()
 	threads[str(metric_id)].join()
