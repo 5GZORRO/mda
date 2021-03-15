@@ -44,9 +44,10 @@ MDA|`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|D
 This section covers all the needs a developer has to get deployment of the development scenario.
 
 #### Prerequisites
-For the signing step, described earlier, we need a public key. Therefore we need to set the operator's public key as an environment variable.
+For the signing step, described earlier, we need a public key. Therefore we need to set the operator's public key as an environment variable. Also, due to postgres addition, we need to set the postgres password: 
 ```
 $ export OPERATOR_PUBLIC_KEY=<PUBLIC_KEY>
+$ export POSTGRES_PW=<POSTGRES_PW>
 ```
 #### Deploy components
 The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
