@@ -1,140 +1,685 @@
 {
-	"openapi":"3.0.2",
-	"info": {
-		"title":"FastAPI",
-		"version":"0.1.0"
-	},
-	"paths": {
-		"/set/": {
-			"post": {
-				"summary":"Set Param",
-				"operationId":"set_param_set__post",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref":"#/components/schemas/Data"
-							}
-						}
-					},
-				"required":true
-				},
-				"responses": {
-					"200": {
-						"description":"Successful Response",
-						"content": {
-							"application/json": {
-								"schema":{}
-							}
-						}
-					},
-					"422": {
-						"description":"Validation Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref":"#/components/schemas/HTTPValidationError"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/dummyData": {
-			"get": {
-				"summary":"Root",
-				"operationId":"root_dummyData_get",
-				"responses": {
-					"200": {
-						"description":"Successful Response",
-						"content": {
-							"application/json": {
-								"schema":{}
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"components": {
-		"schemas": {
-			"Data": {
-				"title":"Data",
-				"required": [
-					"businessID","topic","sliceID","metrics","timestamp"
-				],
-				"type":"object",
-				"properties": {
-					"businessID": {
-						"title":"Businessid",
-						"type":"string"
-					},
-					"topic": {
-						"title":"Topic",
-						"type":"string"
-					},
-					"sliceID": {
-						"title":"Sliceid",
-						"type":"integer"
-					},
-					"metrics": {
-						"title":"Metrics",
-						"type":"array",
-						"items":{}
-					},
-					"timestamp": {
-						"title":"Timestamp",
-						"type":"string"
-					},
-					"timestamp_final": {
-						"title":"Timestamp Final",
-						"type":"string"
-					},
-					"step": {
-						"title":"Step",
-						"type":"string"
-					}
-				}
-			},
-			"HTTPValidationError": {
-				"title":"HTTPValidationError",
-				"type":"object",
-				"properties": {
-					"detail": {
-						"title":"Detail",
-						"type":"array",
-						"items": {
-							"$ref":"#/components/schemas/ValidationError"
-						}
-					}
-				}
-			},
-			"ValidationError": {
-				"title":"ValidationError",
-				"required": [
-					"loc","msg","type"
-				],
-				"type":"object",
-				"properties": {
-					"loc": {
-						"title":"Location",
-						"type":"array",
-						"items": {
-							"type":"string"
-						}
-					},
-					"msg": {
-						"title":"Message",
-						"type":"string"
-					},
-					"type": {
-						"title":"Error Type",
-						"type":"string"
-					}
-				}
-			}
-		}
-	}
+   "openapi":"3.0.2",
+   "info":{
+      "title":"FastAPI",
+      "version":"0.1.0"
+   },
+   "paths":{
+      "/settings":{
+         "get":{
+            "summary":"Get All Configs",
+            "operationId":"get_all_configs_settings_get",
+            "responses":{
+               "200":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "title":"Response 200 Get All Configs Settings Get",
+                           "type":"array",
+                           "items":{
+                              "$ref":"#/components/schemas/Response_Config_Model"
+                           }
+                        },
+                        "example":[
+                           {
+                              "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                              "created_at":"2021-03-11T11:34:00.402075",
+                              "updated_at":"null",
+                              "businessID":36574564,
+                              "topic":"postData",
+                              "networkID":232,
+                              "timestampStart":"2021-03-11T11:34:00",
+                              "timestampEnd":"null",
+                              "metrics":[
+                                 {
+                                    "metricName":"cpu_utilization",
+                                    "metricType":"float",
+                                    "aggregationMethod":"agg",
+                                    "timestampStep":"1h"
+                                 }
+                              ],
+                              "status":1
+                           }
+                        ]
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post":{
+            "summary":"Set Param",
+            "operationId":"set_param_settings_post",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "$ref":"#/components/schemas/Config_Model"
+                     }
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "201":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Config_Model"
+                        },
+                        "example":{
+                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                           "created_at":"2021-03-11T11:34:00.402075",
+                           "updated_at":"null",
+                           "businessID":36574564,
+                           "topic":"postData",
+                           "networkID":232,
+                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampEnd":"null",
+                           "metrics":[
+                              {
+                                 "metricName":"cpu_utilization",
+                                 "metricType":"float",
+                                 "aggregationMethod":"agg",
+                                 "timestampStep":"1h"
+                              }
+                           ],
+                           "status":1
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               },
+               "422":{
+                  "description":"Validation Error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/HTTPValidationError"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/settings/{config_id}":{
+         "get":{
+            "summary":"Get Config Id",
+            "operationId":"get_config_id_settings__config_id__get",
+            "parameters":[
+               {
+                  "required":true,
+                  "schema":{
+                     "title":"Config Id"
+                  },
+                  "name":"config_id",
+                  "in":"path"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Config_Model"
+                        },
+                        "example":{
+                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                           "created_at":"2021-03-11T11:34:00.402075",
+                           "updated_at":"null",
+                           "businessID":36574564,
+                           "topic":"postData",
+                           "networkID":232,
+                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampEnd":"null",
+                           "metrics":[
+                              {
+                                 "metricName":"cpu_utilization",
+                                 "metricType":"float",
+                                 "aggregationMethod":"agg",
+                                 "timestampStep":"1h"
+                              }
+                           ],
+                           "status":1
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               },
+               "422":{
+                  "description":"Validation Error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/HTTPValidationError"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "put":{
+            "summary":"Update Config Id",
+            "operationId":"update_config_id_settings__config_id__put",
+            "parameters":[
+               {
+                  "required":true,
+                  "schema":{
+                     "title":"Config Id"
+                  },
+                  "name":"config_id",
+                  "in":"path"
+               }
+            ],
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "$ref":"#/components/schemas/Update_Config_Model"
+                     }
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Config_Model"
+                        },
+                        "example":{
+                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                           "created_at":"2021-03-11T11:34:00.402075",
+                           "updated_at":"null",
+                           "businessID":36574564,
+                           "topic":"postData",
+                           "networkID":232,
+                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampEnd":"null",
+                           "metrics":[
+                              {
+                                 "metricName":"cpu_utilization",
+                                 "metricType":"float",
+                                 "aggregationMethod":"agg",
+                                 "timestampStep":"1h"
+                              }
+                           ],
+                           "status":1
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               },
+               "422":{
+                  "description":"Validation Error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/HTTPValidationError"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "delete":{
+            "summary":"Delete Config Id",
+            "operationId":"delete_config_id_settings__config_id__delete",
+            "parameters":[
+               {
+                  "required":true,
+                  "schema":{
+                     "title":"Config Id"
+                  },
+                  "name":"config_id",
+                  "in":"path"
+               }
+            ],
+            "responses":{
+               "204":{
+                  "description":"Successful Response"
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               },
+               "422":{
+                  "description":"Validation Error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/HTTPValidationError"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/settings/{config_id}/enable":{
+         "put":{
+            "summary":"Enable Config Id",
+            "operationId":"enable_config_id_settings__config_id__enable_put",
+            "parameters":[
+               {
+                  "required":true,
+                  "schema":{
+                     "title":"Config Id"
+                  },
+                  "name":"config_id",
+                  "in":"path"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Config_Model"
+                        },
+                        "example":{
+                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                           "created_at":"2021-03-11T11:34:00.402075",
+                           "updated_at":"null",
+                           "businessID":36574564,
+                           "topic":"postData",
+                           "networkID":232,
+                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampEnd":"null",
+                           "metrics":[
+                              {
+                                 "metricName":"cpu_utilization",
+                                 "metricType":"float",
+                                 "aggregationMethod":"agg",
+                                 "timestampStep":"1h"
+                              }
+                           ],
+                           "status":1
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               },
+               "422":{
+                  "description":"Validation Error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/HTTPValidationError"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/settings/{config_id}/disable":{
+         "put":{
+            "summary":"Disable Config Id",
+            "operationId":"disable_config_id_settings__config_id__disable_put",
+            "parameters":[
+               {
+                  "required":true,
+                  "schema":{
+                     "title":"Config Id"
+                  },
+                  "name":"config_id",
+                  "in":"path"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Config_Model"
+                        },
+                        "example":{
+                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                           "created_at":"2021-03-11T11:34:00.402075",
+                           "updated_at":"null",
+                           "businessID":36574564,
+                           "topic":"postData",
+                           "networkID":232,
+                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampEnd":"null",
+                           "metrics":[
+                              {
+                                 "metricName":"cpu_utilization",
+                                 "metricType":"float",
+                                 "aggregationMethod":"agg",
+                                 "timestampStep":"1h"
+                              }
+                           ],
+                           "status":0
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/Response_Error_Model"
+                        },
+                        "example":{
+                           "status":"Error",
+                           "message":"Error message."
+                        }
+                     }
+                  }
+               },
+               "422":{
+                  "description":"Validation Error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/HTTPValidationError"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components":{
+      "schemas":{
+         "Config_Model":{
+            "title":"Config_Model",
+            "required":[
+               "businessID",
+               "topic",
+               "networkID",
+               "metrics"
+            ],
+            "type":"object",
+            "properties":{
+               "businessID":{
+                  "title":"Businessid",
+                  "type":"integer"
+               },
+               "topic":{
+                  "title":"Topic",
+                  "type":"string"
+               },
+               "networkID":{
+                  "title":"Networkid",
+                  "type":"integer"
+               },
+               "metrics":{
+                  "title":"Metrics",
+                  "type":"array",
+                  "items":{
+                     "$ref":"#/components/schemas/Metric_Model"
+                  }
+               },
+               "timestampStart":{
+                  "title":"Timestampstart",
+                  "type":"string",
+                  "default":"2021-03-12T14:04:47.918735"
+               },
+               "timestampEnd":{
+                  "title":"Timestampend",
+                  "type":"string"
+               }
+            }
+         },
+         "HTTPValidationError":{
+            "title":"HTTPValidationError",
+            "type":"object",
+            "properties":{
+               "detail":{
+                  "title":"Detail",
+                  "type":"array",
+                  "items":{
+                     "$ref":"#/components/schemas/ValidationError"
+                  }
+               }
+            }
+         },
+         "Metric_Model":{
+            "title":"Metric_Model",
+            "required":[
+               "metricName",
+               "metricType",
+               "timestampStep"
+            ],
+            "type":"object",
+            "properties":{
+               "metricName":{
+                  "title":"Metricname",
+                  "type":"string"
+               },
+               "metricType":{
+                  "title":"Metrictype",
+                  "type":"string"
+               },
+               "aggregationMethod":{
+                  "title":"Aggregationmethod",
+                  "type":"string"
+               },
+               "timestampStep":{
+                  "title":"Timestampstep",
+                  "type":"string"
+               }
+            }
+         },
+         "Response_Config_Model":{
+            "title":"Response_Config_Model",
+            "required":[
+               "id",
+               "created_at",
+               "updated_at",
+               "businessID",
+               "topic",
+               "networkID",
+               "timestampStart",
+               "timestampEnd",
+               "metrics",
+               "status"
+            ],
+            "type":"object",
+            "properties":{
+               "id":{
+                  "title":"Id",
+                  "type":"string",
+                  "format":"uuid"
+               },
+               "created_at":{
+                  "title":"Created At",
+                  "type":"string",
+                  "format":"date-time"
+               },
+               "updated_at":{
+                  "title":"Updated At",
+                  "type":"string",
+                  "format":"date-time"
+               },
+               "businessID":{
+                  "title":"Businessid",
+                  "type":"integer"
+               },
+               "topic":{
+                  "title":"Topic",
+                  "type":"string"
+               },
+               "networkID":{
+                  "title":"Networkid",
+                  "type":"integer"
+               },
+               "timestampStart":{
+                  "title":"Timestampstart",
+                  "type":"string",
+                  "format":"date-time"
+               },
+               "timestampEnd":{
+                  "title":"Timestampend",
+                  "type":"string",
+                  "format":"date-time"
+               },
+               "metrics":{
+                  "title":"Metrics",
+                  "type":"array",
+                  "items":{
+                     "$ref":"#/components/schemas/Metric_Model"
+                  }
+               },
+               "status":{
+                  "title":"Status",
+                  "type":"integer"
+               }
+            }
+         },
+         "Response_Error_Model":{
+            "title":"Response_Error_Model",
+            "required":[
+               "status",
+               "message"
+            ],
+            "type":"object",
+            "properties":{
+               "status":{
+                  "title":"Status",
+                  "type":"string"
+               },
+               "message":{
+                  "title":"Message",
+                  "type":"string"
+               }
+            }
+         },
+         "Update_Config_Model":{
+            "title":"Update_Config_Model",
+            "type":"object",
+            "properties":{
+               "timestampStart":{
+                  "title":"Timestampstart",
+                  "type":"string"
+               },
+               "timestampEnd":{
+                  "title":"Timestampend",
+                  "type":"string"
+               },
+               "metrics":{
+                  "title":"Metrics",
+                  "type":"array",
+                  "items":{
+                     "$ref":"#/components/schemas/Metric_Model"
+                  }
+               }
+            }
+         },
+         "ValidationError":{
+            "title":"ValidationError",
+            "required":[
+               "loc",
+               "msg",
+               "type"
+            ],
+            "type":"object",
+            "properties":{
+               "loc":{
+                  "title":"Location",
+                  "type":"array",
+                  "items":{
+                     "type":"string"
+                  }
+               },
+               "msg":{
+                  "title":"Message",
+                  "type":"string"
+               },
+               "type":{
+                  "title":"Error Type",
+                  "type":"string"
+               }
+            }
+         }
+      }
+   }
 }

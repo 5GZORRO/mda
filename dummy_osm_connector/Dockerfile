@@ -1,6 +1,6 @@
 FROM python:3.7
 
-RUN pip install fastapi uvicorn uuid requests datetime typing
+RUN pip install fastapi uvicorn uuid requests datetime typing python-dateutil
 
 EXPOSE 4500
 

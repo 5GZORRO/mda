@@ -1,6 +1,6 @@
 FROM python:3.7
 
-RUN pip install fastapi uvicorn uuid requests rsa pycryptodome typing kafka-python
+RUN pip install fastapi uvicorn uuid requests rsa pycryptodome typing kafka-python sqlalchemy sqlalchemy-utils psycopg2
 
 EXPOSE 4000
 
