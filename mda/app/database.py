@@ -16,7 +16,7 @@ class Config(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, nullable=True)
     business_id = Column(Integer, nullable=False)
-    kafka_topic = Column(String(20), nullable=False)
+    kafka_topic = Column(String(250), nullable=False)
     network_id = Column(Integer, nullable=False)
     timestamp_start = Column(DateTime, nullable=False)
     timestamp_end = Column(DateTime, nullable=True)
@@ -46,9 +46,9 @@ class Metric(Base):
     __tablename__ = 'metric'
     _id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
     config_id = Column(postgresql.UUID(as_uuid=True), ForeignKey('config._id'))
-    metric_name = Column(String(20), nullable=False)
-    metric_type = Column(String(20), nullable=False)
-    aggregation_method = Column(String(20), nullable=True)
+    metric_name = Column(String(250), nullable=False)
+    metric_type = Column(String(250), nullable=False)
+    aggregation_method = Column(String(250), nullable=True)
     timestamp_step = Column(String(10), nullable=False)
 
     def __init__(self, metric_name, metric_type, aggregation_method, timestamp_step, config_id):
