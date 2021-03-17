@@ -195,16 +195,16 @@ def delete_config(config_id):
         return -1
 # ----------------------------------------------------------------#
 #Create db if not exists
+#try:
+#    resp1 = Config.query.first()
+#    resp2 = Metric.query.first()
+#except Exception as e:
 try:
-    resp1 = Config.query.first()
-    resp2 = Metric.query.first()
-except Exception as e:
     try:
-        try:
-          Base.metadata.drop_all(bind=engine)
-        except Exception as e:
-          print(e)
-        Base.metadata.create_all(bind=engine)
+      Base.metadata.drop_all(bind=engine)
     except Exception as e:
-        print(e)
-        sys.exit(0)
+      print(e)
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(e)
+    sys.exit(0)
