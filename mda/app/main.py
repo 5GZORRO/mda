@@ -28,7 +28,7 @@ try:
   POSTGRES_URL = os.environ["POSTGRES_URL"]
   POSTGRES_DB = os.environ["POSTGRES_DB"]
   RESET_DB = os.environ["RESET_DB"]
-  publicKeyOperator = os.environ["OPERATOR_PUBLIC_KEY"]
+  #publicKeyOperator = os.environ["OPERATOR_PUBLIC_KEY"]
 except Exception as e:
   print("Environment variable does not exists.")
   sys.exit(0)
