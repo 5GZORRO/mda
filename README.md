@@ -7,7 +7,36 @@
 This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for collecting, signing and pushing monitoring data, provided by each Resource and Service Provider, towards the Data Lake. As monitoring data is presented over time, it can also be aggregated and made available in a proper manner to perform the desired analytics.
 
 ## Production
-This section will be available later on. For now, we tender a confluence page available online describing the intended full pipeline (steps and parameters skeleton). Consult it [here](https://confluence.i2cat.net/pages/viewpage.action?spaceKey=5GP&title=Monitoring+Data+Aggregator+Pipeline)
+
+### Pipeline Description
+
+Production scenario.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/32877599/113858543-c07bdc80-979b-11eb-8b52-60dbaf963d63.png" />
+</p>
+
+### Deployment Instructions
+This section covers all the needs a developer has to get deployment of the production mda component.
+
+#### Prerequisites
+For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+
+#### Deploy components
+The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
+```
+$ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
+```
+ * **Note:** If it is required to utilize the personal access token and you do not possess that feature, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+
+Then, for build and up the docker compose we have:
+```
+$ docker-compose -f docker-compose-production.yml up --build
+```
+ * **Note:** If you want to deploy only one component, you can use:
+```
+$ docker-compose -f docker-compose-production.yml up --build <component_name>
+```
 
 ## Development
 
@@ -29,34 +58,25 @@ Currently, our pipeline is composed of five main steps, each one held for:
 ### Supported Endpoints
 The following table displays the endpoints used in the development scenario:
 
-**Component**|**Endpoint**|**Description**|**Method**
-:----|:----|:----|:----
-MDA|`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
-MDA|`http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
-MDA|`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
-MDA|`http://<IP>:4000/settings/:id`|Modify the current monitoring spec|PUT
-MDA|`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
-MDA|`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
-MDA|`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
+**Endpoint**|**Description**|**Method**
+|:----|:----|:----
+`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
+`http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
+`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
+`http://<IP>:4000/settings/:id`|Modify the current monitoring spec|PUT
+`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
+`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
+`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
 
 
 ### Deployment Instructions
 This section covers all the needs a developer has to get deployment of the development scenario.
 
 #### Prerequisites
-For the signing step, described earlier, we need a public key. Therefore we need to set the operator's public key as an environment variable. Also, due to postgres addition, we need to set the postgres password: 
-```
-$ export OPERATOR_PUBLIC_KEY=<PUBLIC_KEY>
-$ export POSTGRES_PW=<POSTGRES_PW>
-```
-#### Deploy components
-The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
-```
-$ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
-```
- * **Note:** If it is required to utilize the personal access token and you do not possess that feature, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
 
-Then, for build and up the docker compose we have:
+#### Deploy components
+For build and up the docker compose we have:
 ```
 $ docker-compose -f docker-compose-development.yml up --build
 ```
