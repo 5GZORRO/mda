@@ -59,14 +59,14 @@ Currently, our pipeline is composed of five main steps, each one held for:
 The following table displays the endpoints used in the development scenario:
 
 **Component**|**Endpoint**|**Description**|**Method**
-:----|:----|:----|:----
-MDA|`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
-MDA|`http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
-MDA|`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
-MDA|`http://<IP>:4000/settings/:id`|Modify the current monitoring spec|PUT
-MDA|`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
-MDA|`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
-MDA|`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
+|:----|:----|:----
+`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
+`http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
+`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
+`http://<IP>:4000/settings/:id`|Modify the current monitoring spec|PUT
+`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
+`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
+`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
 
 
 ### Deployment Instructions
