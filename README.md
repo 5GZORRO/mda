@@ -10,7 +10,7 @@ This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for c
 
 ### Pipeline Description
 
-Production scenario.
+We tender a confluence page available online describing the intended full pipeline (steps and parameters skeleton). Consult it [here](https://confluence.i2cat.net/pages/viewpage.action?spaceKey=5GP&title=Monitoring+Data+Aggregator+Pipeline)
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/32877599/113858543-c07bdc80-979b-11eb-8b52-60dbaf963d63.png" />
