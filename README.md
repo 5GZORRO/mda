@@ -20,7 +20,7 @@ Production scenario.
 This section covers all the needs a developer has to get deployment of the production mda component.
 
 #### Prerequisites
-For the signing step, described earlier, we some environment variables. Therefore we need to set the environment variable in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
 
 #### Deploy components
 The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
@@ -73,7 +73,7 @@ MDA|`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|D
 This section covers all the needs a developer has to get deployment of the development scenario.
 
 #### Prerequisites
-For the signing step, described earlier, we some environment variables. Therefore we need to set the environment variable in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
 
 #### Deploy components
 For build and up the docker compose we have:
