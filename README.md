@@ -73,7 +73,12 @@ The following table displays the endpoints used in the development scenario:
 This section covers all the needs a developer has to get deployment of the development scenario.
 
 #### Prerequisites
-For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+For run this component, we need:
+* Define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+* Run the kafka compose with:
+```
+$ docker-compose -f docker-compose-kafka.yml up --build
+```
 
 #### Deploy components
 For build and up the docker compose we have:
