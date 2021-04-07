@@ -58,7 +58,7 @@ Currently, our pipeline is composed of five main steps, each one held for:
 ### Supported Endpoints
 The following table displays the endpoints used in the development scenario:
 
-**Component**|**Endpoint**|**Description**|**Method**
+**Endpoint**|**Description**|**Method**
 |:----|:----|:----
 `http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
 `http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
