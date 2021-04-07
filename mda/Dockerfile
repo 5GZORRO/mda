@@ -1,6 +1,10 @@
 FROM python:3.7
 
-RUN pip install fastapi uvicorn uuid requests rsa pycryptodome typing kafka-python sqlalchemy sqlalchemy-utils psycopg2
+ENV TZ="Europe/Lisbon"
+
+RUN pip install fastapi uvicorn uuid requests rsa pycryptodome typing kafka-python sqlalchemy==1.3.23 sqlalchemy-utils psycopg2 python-dateutil timeloop
+
+VOLUME /logs
 
 EXPOSE 4000
 

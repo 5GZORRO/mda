@@ -26,9 +26,12 @@
                               "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                               "created_at":"2021-03-11T11:34:00.402075",
                               "updated_at":"null",
-                              "businessID":36574564,
-                              "topic":"postData",
-                              "networkID":232,
+                              "businessID":"business1",
+                              "topic":"test1",
+                              "networkID":1,
+                              "tenantID":"tenant1",
+                              "referenceID":"reference1",
+                              "resourceID":"resource1",
                               "timestampStart":"2021-03-11T11:34:00",
                               "timestampEnd":"null",
                               "metrics":[
@@ -36,7 +39,7 @@
                                     "metricName":"cpu_utilization",
                                     "metricType":"float",
                                     "aggregationMethod":"agg",
-                                    "timestampStep":"1h"
+                                    "step":"1h"
                                  }
                               ],
                               "status":1
@@ -86,9 +89,12 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":36574564,
-                           "topic":"postData",
-                           "networkID":232,
+                           "businessID":"business1",
+                           "topic":"test1",
+                           "networkID":1,
+                           "tenantID":"tenant1",
+                           "referenceID":"reference1",
+                           "resourceID":"resource1",
                            "timestampStart":"2021-03-11T11:34:00",
                            "timestampEnd":"null",
                            "metrics":[
@@ -96,7 +102,7 @@
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
                                  "aggregationMethod":"agg",
-                                 "timestampStep":"1h"
+                                 "step":"1h"
                               }
                            ],
                            "status":1
@@ -157,9 +163,12 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":36574564,
-                           "topic":"postData",
-                           "networkID":232,
+                           "businessID":"business1",
+                           "topic":"test1",
+                           "networkID":1,
+                           "tenantID":"tenant1",
+                           "referenceID":"reference1",
+                           "resourceID":"resource1",
                            "timestampStart":"2021-03-11T11:34:00",
                            "timestampEnd":"null",
                            "metrics":[
@@ -167,7 +176,7 @@
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
                                  "aggregationMethod":"agg",
-                                 "timestampStep":"1h"
+                                 "step":"1h"
                               }
                            ],
                            "status":1
@@ -236,9 +245,12 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":36574564,
-                           "topic":"postData",
-                           "networkID":232,
+                           "businessID":"business1",
+                           "topic":"test1",
+                           "networkID":1,
+                           "tenantID":"tenant1",
+                           "referenceID":"reference1",
+                           "resourceID":"resource1",
                            "timestampStart":"2021-03-11T11:34:00",
                            "timestampEnd":"null",
                            "metrics":[
@@ -246,7 +258,7 @@
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
                                  "aggregationMethod":"agg",
-                                 "timestampStep":"1h"
+                                 "step":"1h"
                               }
                            ],
                            "status":1
@@ -350,9 +362,12 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":36574564,
-                           "topic":"postData",
-                           "networkID":232,
+                           "businessID":"business1",
+                           "topic":"test1",
+                           "networkID":1,
+                           "tenantID":"tenant1",
+                           "referenceID":"reference1",
+                           "resourceID":"resource1",
                            "timestampStart":"2021-03-11T11:34:00",
                            "timestampEnd":"null",
                            "metrics":[
@@ -360,7 +375,7 @@
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
                                  "aggregationMethod":"agg",
-                                 "timestampStep":"1h"
+                                 "step":"1h"
                               }
                            ],
                            "status":1
@@ -421,9 +436,12 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":36574564,
-                           "topic":"postData",
-                           "networkID":232,
+                           "businessID":"business1",
+                           "topic":"test1",
+                           "networkID":1,
+                           "tenantID":"tenant1",
+                           "referenceID":"reference1",
+                           "resourceID":"resource1",
                            "timestampStart":"2021-03-11T11:34:00",
                            "timestampEnd":"null",
                            "metrics":[
@@ -431,7 +449,7 @@
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
                                  "aggregationMethod":"agg",
-                                 "timestampStep":"1h"
+                                 "step":"1h"
                               }
                            ],
                            "status":0
@@ -475,13 +493,16 @@
                "businessID",
                "topic",
                "networkID",
+               "tenantID",
+               "resourceID",
+               "referenceID",
                "metrics"
             ],
             "type":"object",
             "properties":{
                "businessID":{
                   "title":"Businessid",
-                  "type":"integer"
+                  "type":"string"
                },
                "topic":{
                   "title":"Topic",
@@ -490,6 +511,18 @@
                "networkID":{
                   "title":"Networkid",
                   "type":"integer"
+               },
+               "tenantID":{
+                  "title":"Tenantid",
+                  "type":"string"
+               },
+               "resourceID":{
+                  "title":"Resourceid",
+                  "type":"string"
+               },
+               "referenceID":{
+                  "title":"Referenceid",
+                  "type":"string"
                },
                "metrics":{
                   "title":"Metrics",
@@ -501,11 +534,13 @@
                "timestampStart":{
                   "title":"Timestampstart",
                   "type":"string",
-                  "default":"2021-03-12T14:04:47.918735"
+                  "format":"date-time",
+                  "default":"2021-04-07T10:12:14.481898"
                },
                "timestampEnd":{
                   "title":"Timestampend",
-                  "type":"string"
+                  "type":"string",
+                  "format":"date-time"
                }
             }
          },
@@ -527,7 +562,7 @@
             "required":[
                "metricName",
                "metricType",
-               "timestampStep"
+               "step"
             ],
             "type":"object",
             "properties":{
@@ -543,8 +578,12 @@
                   "title":"Aggregationmethod",
                   "type":"string"
                },
-               "timestampStep":{
-                  "title":"Timestampstep",
+               "step":{
+                  "title":"Step",
+                  "type":"string"
+               },
+               "next_run_at":{
+                  "title":"Next Run At",
                   "type":"string"
                }
             }
@@ -561,7 +600,10 @@
                "timestampStart",
                "timestampEnd",
                "metrics",
-               "status"
+               "status",
+               "tenantID",
+               "resourceID",
+               "referenceID"
             ],
             "type":"object",
             "properties":{
@@ -582,7 +624,7 @@
                },
                "businessID":{
                   "title":"Businessid",
-                  "type":"integer"
+                  "type":"string"
                },
                "topic":{
                   "title":"Topic",
@@ -612,6 +654,18 @@
                "status":{
                   "title":"Status",
                   "type":"integer"
+               },
+               "tenantID":{
+                  "title":"Tenantid",
+                  "type":"string"
+               },
+               "resourceID":{
+                  "title":"Resourceid",
+                  "type":"string"
+               },
+               "referenceID":{
+                  "title":"Referenceid",
+                  "type":"string"
                }
             }
          },
@@ -637,13 +691,10 @@
             "title":"Update_Config_Model",
             "type":"object",
             "properties":{
-               "timestampStart":{
-                  "title":"Timestampstart",
-                  "type":"string"
-               },
                "timestampEnd":{
                   "title":"Timestampend",
-                  "type":"string"
+                  "type":"string",
+                  "format":"date-time"
                },
                "metrics":{
                   "title":"Metrics",

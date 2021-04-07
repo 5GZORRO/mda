@@ -37,7 +37,7 @@ async def send_config_mda():
 				}
 		],
 		"timestampStart": "2021-03-12T11:34:00",
-		"timestampEnd": "2021-03-15T18:34:00"
+		"timestampEnd": "2021-03-26T18:34:00"
 		#"timestamp_start": json.dumps(datetime.datetime.now(), default=converter),
 		#"timestamp_final": json.dumps(datetime.datetime.now(), default=converter)
 	}
@@ -93,7 +93,7 @@ async def update_config_mda(id):
 				}
 		],
 		"timestampStart": "2021-03-12T11:34:00",
-		"timestampEnd": "2021-03-12T15:34:00"
+		"timestampEnd": "2021-03-26T15:34:00"
 	}
 
 
