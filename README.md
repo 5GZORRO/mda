@@ -10,7 +10,7 @@ This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for c
 
 ### Pipeline Description
 
-Production scenario.
+We tender a confluence page available online describing the intended full pipeline (steps and parameters skeleton). Consult it [here](https://confluence.i2cat.net/pages/viewpage.action?spaceKey=5GP&title=Monitoring+Data+Aggregator+Pipeline)
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/32877599/113858543-c07bdc80-979b-11eb-8b52-60dbaf963d63.png" />
@@ -21,6 +21,28 @@ This section covers all the needs a developer has to get deployment of the produ
 
 #### Prerequisites
 For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+Also, it is required to have PostgreSQL installed on the machine. For Ubuntu 20.04, to use the apt repository, follow these steps:
+```
+# Create the file repository configuration:
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import the repository signing key:
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# Update the package lists:
+sudo apt-get update
+
+# Install the latest version of PostgreSQL.
+sudo apt-get -y install postgresql
+
+# If you want to install a specific version, you can use postgresql-version instead of postgresql. For example, to install PostgreSQL version 12, you use the following command:
+sudo apt-get install postgresql-12
+
+# When you installed PostgreSQL, the installation process created a user account called postgres associated with the default postgres role. To connect to PostgreSQL using the postgres role, you switch over to the postgres account on your server by typing:
+sudo -i -u postgres
+
+# It will prompt for the password of the current user. You need to provide the password and hit the Enter keyboard.
+```
 
 #### Deploy components
 The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
@@ -51,7 +73,7 @@ For the development stage, at this point, our focus has been on implementing a p
 Currently, our pipeline is composed of five main steps, each one held for:
 1. VS sends to MDA a __configuration__ with dynamic variables specifying the monitored metrics 
 2. MDA fetches from OSM the __metric values__ 
-3. Metric __aggregation__, via Prometheus python client (if the case)
+3. Metric __aggregation__, via TimescaleDB aggregation operation (if the case)
 4. __Hash/signing__ data with operator's key making use of SHA256 and RSA algorithms
 5. __Inject__ data into a DL Kafka Topic
 
@@ -73,7 +95,13 @@ The following table displays the endpoints used in the development scenario:
 This section covers all the needs a developer has to get deployment of the development scenario.
 
 #### Prerequisites
-For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+For run this component, we need:
+* Define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+* Install PostgreSQL database as mentioned previously
+* Run the kafka compose with:
+```
+$ docker-compose -f docker-compose-kafka.yml up --build
+```
 
 #### Deploy components
 For build and up the docker compose we have:
