@@ -37,6 +37,11 @@ sudo apt-get -y install postgresql
 
 # If you want to install a specific version, you can use postgresql-version instead of postgresql. For example, to install PostgreSQL version 12, you use the following command:
 sudo apt-get install postgresql-12
+
+# When you installed PostgreSQL, the installation process created a user account called postgres associated with the default postgres role. To connect to PostgreSQL using the postgres role, you switch over to the postgres account on your server by typing:
+sudo -i -u postgres
+
+# It will prompt for the password of the current user. You need to provide the password and hit the Enter keyboard.
 ```
 
 #### Deploy components
