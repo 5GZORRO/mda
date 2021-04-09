@@ -21,6 +21,23 @@ This section covers all the needs a developer has to get deployment of the produ
 
 #### Prerequisites
 For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+Also, it is required to have PostgreSQL installed on the machine. For Ubuntu 20.04, to use the apt repository, follow these steps:
+```
+# Create the file repository configuration:
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import the repository signing key:
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# Update the package lists:
+sudo apt-get update
+
+# Install the latest version of PostgreSQL.
+sudo apt-get -y install postgresql
+
+# If you want to install a specific version, you can use postgresql-version instead of postgresql. For example, to install PostgreSQL version 12, you use the following command:
+sudo apt-get install postgresql-12
+```
 
 #### Deploy components
 The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
