@@ -92,6 +92,7 @@ This section covers all the needs a developer has to get deployment of the devel
 #### Prerequisites
 For run this component, we need:
 * Define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
+* Install PostgreSQL database as mentioned previously
 * Run the kafka compose with:
 ```
 $ docker-compose -f docker-compose-kafka.yml up --build
