@@ -28,6 +28,10 @@ try:
   POSTGRES_URL = os.environ["POSTGRES_URL"]
   POSTGRES_DB = os.environ["POSTGRES_DB"]
   RESET_DB = os.environ["RESET_DB"]
+  
+  KAFKA_HOST = os.environ["KAFKA_HOST"]
+  KAFKA_PORT = os.environ["KAFKA_PORT"]
+  
   #publicKeyOperator = os.environ["OPERATOR_PUBLIC_KEY"]
 except Exception as e:
   print("Environment variable does not exists.")
@@ -136,14 +140,14 @@ def request_orchestrator(request_metric, request_schedule, resourceID, reference
   
     payload_encoded = {k: str(v).encode('utf-8') for k, v in dataHash.items()}
     hashData = {k: hashlib.sha256(v).hexdigest() for k,v in payload_encoded.items()}
-    info_log(None, f'Hashed Data: {hashData}')
+    info_log(None, f'Raw Data: {data} \nHashed Data: {hashData}')
   
     public_key, private_key = rsa.newkeys(1024)
   
     dataHashEncrypt = {rsa.encrypt(k.encode(), private_key): rsa.encrypt(v.encode(), private_key) for k,v in hashData.items()}
     info_log(None, f'Signup Data: {dataHashEncrypt}')
   
-    producer = KafkaProducer(bootstrap_servers=['172.31.8.183:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8'), api_version=(0,10,1))
+    producer = KafkaProducer(bootstrap_servers=[KAFKA_HOST+':'+KAFKA_PORT], value_serializer=lambda x: json.dumps(x).encode('utf-8'), api_version=(0,10,1))
     producer.send('topic_test', key=list(dataHashEncrypt.values())[0],  value=data)
     info_log(200, f'Post Data into DL Kafka Topic {kafka_topic}')
     return 1
