@@ -52,7 +52,7 @@ class Config_Model(BaseModel):
   resourceID: str
   referenceID: str
   metrics: List[Metric_Model]
-  timestampStart: Optional[datetime.datetime] = datetime.datetime.now()
+  timestampStart: Optional[datetime.datetime] = None
   timestampEnd: Optional[datetime.datetime] = None
 
 class Update_Config_Model(BaseModel):
@@ -244,7 +244,9 @@ def shutdown_event():
 																	 "example": {"status": "Error", "message": "Error message."}}}}})
 async def set_param(config: Config_Model):
   global update_queue_flag
-  if config.timestampStart < datetime.datetime.now() - relativedelta(minutes=1):
+  if config.timestampStart == None:
+    config.timestampStart = datetime.datetime.now()
+  elif config.timestampStart < datetime.datetime.now() - relativedelta(minutes=1):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after current now."})
   if config.timestampEnd != None and config.timestampStart > config.timestampEnd:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
