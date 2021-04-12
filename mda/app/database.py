@@ -1,13 +1,11 @@
 from .main import *
 
 engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PW + '@' + POSTGRES_URL + '/' + POSTGRES_DB, convert_unicode=True)
-connection = engine.raw_connection()
-cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 # Create database if it does not exist.
 if not database_exists(engine.url):
   create_database(engine.url)
-else:
-  engine.connect()
+connection = engine.raw_connection()
+cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base()
 Base.query = db_session.query_property()
@@ -291,6 +289,7 @@ try:
 except Exception as e:
   try:
     Base.metadata.create_all(bind=engine)
+    connection.commit()
     '''query_extension = "CREATE EXTENSION IF NOT EXISTS timescaledb;"
     query_index = "CREATE INDEX metrics_index ON metric (next_run_at ASC, _id);"
     query_create_metric_hypertable = "SELECT create_hypertable('metric', 'next_run_at');"
@@ -312,6 +311,7 @@ if RESET_DB.lower() == 'true':
     except Exception as e:
       print(e)
     Base.metadata.create_all(bind=engine)
+    connection.commit()
     '''query_extension = "CREATE EXTENSION IF NOT EXISTS timescaledb;"
     query_index = "CREATE INDEX ON metric (next_run_at ASC);"
     query_create_metric_hypertable = "SELECT create_hypertable('metric', 'next_run_at');"
