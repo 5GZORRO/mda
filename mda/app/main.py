@@ -244,7 +244,7 @@ def shutdown_event():
 																	 "example": {"status": "Error", "message": "Error message."}}}}})
 async def set_param(config: Config_Model):
   global update_queue_flag
-  if config.timestampStart < datetime.datetime.now():
+  if config.timestampStart < datetime.datetime.now() - relativedelta(minutes=1):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after current now."})
   if config.timestampEnd != None and config.timestampStart > config.timestampEnd:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
