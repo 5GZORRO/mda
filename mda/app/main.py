@@ -148,7 +148,7 @@ def request_orchestrator(request_metric, request_schedule, resourceID, reference
     info_log(None, f'Signup Data: {dataHashEncrypt}')
   
     producer = KafkaProducer(bootstrap_servers=[KAFKA_HOST+':'+KAFKA_PORT], value_serializer=lambda x: json.dumps(x).encode('utf-8'), api_version=(0,10,1))
-    producer.send('topic_test', key=list(dataHashEncrypt.values())[0],  value=data)
+    producer.send(kafka_topic, key=list(dataHashEncrypt.values())[0],  value=data)
     info_log(200, f'Post Data into DL Kafka Topic {kafka_topic}')
     return 1
   except Exception as e:
