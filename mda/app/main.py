@@ -42,6 +42,7 @@ class Metric_Model(BaseModel):
   metricType: str
   aggregationMethod: str = None
   step: str
+  step_aggregation: Optional[str] = None
   next_run_at: Optional[str] = None
 
 class Config_Model(BaseModel):
@@ -79,14 +80,18 @@ class Response_Error_Model(BaseModel):
 	message: str
 
 # Json response example
-json_response_enable = {"id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b","created_at": "2021-03-11T11:34:00.402075","updated_at": "null","businessID": 36574564,"businessID": "business1", "topic": "test1", "networkID": 1, "tenantID": "tenant1", "referenceID": "reference1", "resourceID": "resource1","timestampStart": "2021-03-11T11:34:00","timestampEnd": "null","metrics": [{"metricName": "cpu_utilization","metricType": "float","aggregationMethod": "agg","step": "1h"}],"status": 1}
+json_response_enable = {"id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b","created_at": "2021-03-11T11:34:00.402075","updated_at": "null","businessID": 36574564,"businessID": "business1", "topic": "test1", "networkID": 1, "tenantID": "tenant1", "referenceID": "reference1", "resourceID": "resource1","timestampStart": "2021-03-11T11:34:00","timestampEnd": "null","metrics": [{"metricName": "cpu_utilization","metricType": "float","aggregationMethod": "agg","step": "1h","step_aggregation": "5m"}],"status": 1}
 json_response_disable = json_response_enable.copy()
 json_response_disable['status'] = 0
+
+agg_options = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'STDDEV']
+
+step_options = ['s', 'm', 'h', 'd', 'w']
 
 
 wait_queue = PriorityQueue()
 metrics_queue = PriorityQueue()
-num_fetch_threads = 10
+num_fetch_threads = 100
 first_metric_aux = None
 update_queue_flag = False
 
@@ -104,40 +109,8 @@ def update_first_metric_aux():
   wait_queue.put(aux)
   return aux[0]
   
-def request_orchestrator(request_metric, request_schedule, resourceID, referenceID, next_run_at, tenantID, businessID, networkID, kafka_topic):
+def send_kafka(data, dataHash, kafka_topic):
   try:
-    # curl TBD to 'http://localhost:9090/api/v1/query=cpu_utilization&time=2015-07-01T20:10:51'
-    endpoint = 'http://osm:4500/monitoringData?'
-    request_url = endpoint + request_metric + request_schedule
-    response = requests.get(request_url)
-    if response.status_code != 200:
-      info_log(400, "Request to OSM not sucessful")
-      #print(f'Error: Request to OSM not successful')
-      return('Error in fetching data!', 200)
-    resp = response.text
-    json_data = json.loads(resp)
-    info_log(None, f'Response from OSM: {resp}')
-  
-    # Create JSON object that will be sent to DL Kafka Topic
-    monitoringData = {
-        "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
-        "metricValue" : json_data["data"]["result"][0]["values"][0][1],
-        "resourceID" : resourceID,
-        "referenceID" : referenceID,
-        "timestamp" : str(next_run_at)
-    }
-    
-    dataHash = {
-        "data" : monitoringData
-    }
-  
-    data = {
-        "operatorID" : tenantID,
-        "businessID" : businessID,
-        "networkID" : networkID
-    }
-    data["monitoringData"] = monitoringData
-  
     payload_encoded = {k: str(v).encode('utf-8') for k, v in dataHash.items()}
     hashData = {k: hashlib.sha256(v).hexdigest() for k,v in payload_encoded.items()}
     info_log(None, f'Raw Data: {data} \nHashed Data: {hashData}')
@@ -154,22 +127,106 @@ def request_orchestrator(request_metric, request_schedule, resourceID, reference
   except Exception as e:
     info_log(400, 'Erro in request_orchestrator: ' + str(e))
     return 0
+  
+def send_aggregation(metric_name, resourceID, referenceID, next_run_at, tenantID, businessID, networkID, kafka_topic, aggregation, metric_id, next_aggregation, step_aggregation):
+  try:
+    value = get_last_aggregation(metric_id, aggregation, next_aggregation, step_aggregation)
+    # Create JSON object that will be sent to DL Kafka Topic
+    monitoringData = {
+      "metricName" : metric_name,
+      "metricValue" : value,
+      "resourceID" : resourceID,
+      "referenceID" : referenceID,
+      "timestamp" : str(next_run_at),
+      "aggregationMethod": aggregation
+    }
+    
+    dataHash = {
+        "data" : monitoringData
+    }
+  
+    data = {
+        "operatorID" : tenantID,
+        "businessID" : businessID,
+        "networkID" : networkID
+    }
+    data["monitoringData"] = monitoringData
+    send_kafka(data, dataHash, kafka_topic)
+    print('SEND AGGREGATION-> '+str(next_run_at)+' -> '+ str(value))
+    return 1
+  except Exception as e:
+    print('send_aggregation-> ' + str(e))
+    info_log(400, 'Erro in request_orchestrator: ' + str(e))
+    return 0
+  
+def request_orchestrator(metric_name, resourceID, referenceID, next_run_at, tenantID, businessID, networkID, kafka_topic, aggregation, metric_id):
+  try:
+    request_metric = "match="+metric_name+"&"
+    request_schedule = "start="+str(next_run_at) 
+    # curl TBD to 'http://localhost:9090/api/v1/query=cpu_utilization&time=2015-07-01T20:10:51'
+    endpoint = 'http://osm:4500/monitoringData?'
+    request_url = endpoint + request_metric + request_schedule
+    response = requests.get(request_url)
+    if response.status_code != 200:
+      info_log(400, "Request to OSM not sucessful")
+      #print(f'Error: Request to OSM not successful')
+      return('Error in fetching data!', 200)
+    resp = response.text
+    json_data = json.loads(resp)
+    info_log(None, f'Response from OSM: {resp}')
+    
+    if aggregation != None:
+      #Save value in db
+      insert_metric_value(metric_id, json_data["data"]["result"][0]["values"][0][1], next_run_at)
+    else:
+      # Create JSON object that will be sent to DL Kafka Topic
+      monitoringData = {
+        "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
+        "metricValue" : json_data["data"]["result"][0]["values"][0][1],
+        "resourceID" : resourceID,
+        "referenceID" : referenceID,
+        "timestamp" : str(next_run_at)
+      }
+      
+      dataHash = {
+          "data" : monitoringData
+      }
+    
+      data = {
+          "operatorID" : tenantID,
+          "businessID" : businessID,
+          "networkID" : networkID
+      }
+      data["monitoringData"] = monitoringData
+      send_kafka(data, dataHash, kafka_topic)
+      print('SEND DATA-> '+str(next_run_at)+' -> '+ str(json_data["data"]["result"][0]["values"][0][1]))
+    return 1
+  except Exception as e:
+    print('request_orchestrator-> ' + str(e))
+    info_log(400, 'Erro in request_orchestrator: ' + str(e))
+    return 0
 
 # Worker thread function
 def queue_consumer(i, q):
   global update_queue_flag
-  while True:
-    next_item = q.get()
-    request_metric = "match="+next_item[5]+"&"
-    request_schedule = "start="+str(next_item[0]) 
-    info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {i})')
-    info_log(None, f'{datetime.datetime.now()} - UC1: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]})')
-    request_orchestrator(request_metric, request_schedule, next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9])
-    
-    # after completed the sign/push operations we must perform a query to the db modifying the next_run_at
-    update_next_run(next_item[4], next_item[3])
-    update_queue_flag = True
-    q.task_done()
+  try:
+    while True:
+      next_item = q.get()
+      info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {i})')
+      info_log(None, f'{datetime.datetime.now()} - UC1: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]})')
+      
+      if next_item[16] == 1:
+        #Send aggregation
+        send_aggregation(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[14])
+      else:
+        #Send metric
+        request_orchestrator(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4])
+        update_next_run(next_item[4])
+      
+      update_queue_flag = True
+      q.task_done()
+  except Exception as e:
+    print(e)
    
 def validate_uuid4(uuid_string):
   try:
@@ -231,7 +288,10 @@ def shutdown_event():
   global wait_queue
   wait_queue.join()
   metrics_queue.join()
+  #Close connection db
+  close_connection()
   return
+
 
 # ----------------- REST FASTAPI METHODS -------------------------#
 # ----------------------------------------------------------------#
@@ -244,6 +304,11 @@ def shutdown_event():
 																	 "example": {"status": "Error", "message": "Error message."}}}}})
 async def set_param(config: Config_Model):
   global update_queue_flag
+  for metric in config.metrics:
+    if metric.aggregationMethod != None and metric.aggregationMethod.upper() not in agg_options:
+      return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
+    if metric.step_aggregation != None and metric.step_aggregation[-1] not in step_options and metric.step[-1] not in step_options:
+      return JSONResponse(status_code=404, content={"status": "Error", "message": "Step and step aggregation options is "+str(step_options)+"."})
   if config.timestampStart == None:
     config.timestampStart = datetime.datetime.now()
   elif config.timestampStart < datetime.datetime.now() - relativedelta(minutes=1):
