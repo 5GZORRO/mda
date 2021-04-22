@@ -19,7 +19,9 @@ import psycopg2.extras
 from dateutil.relativedelta import relativedelta
 from timeloop import Timeloop
 from datetime import timedelta
-logging.basicConfig(filename='logs/'+'mda.json', level=logging.CRITICAL, format='{ "timestamp": "%(asctime)s.%(msecs)03dZ", %(message)s}', datefmt='%Y-%m-%dT%H:%M:%S')
+logging.basicConfig(filename='logs/'+'mda.json', level=logging.INFO, format='{ "timestamp": "%(asctime)s.%(msecs)03dZ", %(message)s}', datefmt='%Y-%m-%dT%H:%M:%S')
+logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
+logging.getLogger("kafka").setLevel(logging.CRITICAL)
 
 # Environment variables 
 try:
@@ -40,10 +42,18 @@ except Exception as e:
 class Metric_Model(BaseModel):
   metricName: str
   metricType: str
-  aggregationMethod: str = None
   step: str
+  aggregationMethod: Optional[str] = None
   step_aggregation: Optional[str] = None
-  next_run_at: Optional[str] = None
+
+class Response_Metric_Model(BaseModel):
+  metricName: str
+  metricType: str
+  step: str
+  aggregationMethod: Optional[str] = None
+  step_aggregation: Optional[str] = None
+  next_run_at: datetime.datetime
+  next_aggregation: Optional[datetime.datetime] = None
 
 class Config_Model(BaseModel):
   businessID: str
@@ -68,8 +78,8 @@ class Response_Config_Model(BaseModel):
 	topic: str
 	networkID: int
 	timestampStart: datetime.datetime
-	timestampEnd: datetime.datetime
-	metrics: List[Metric_Model]
+	timestampEnd: Optional[datetime.datetime] = None
+	metrics: List[Response_Metric_Model]
 	status: int
 	tenantID: str
 	resourceID: str
@@ -80,7 +90,7 @@ class Response_Error_Model(BaseModel):
 	message: str
 
 # Json response example
-json_response_enable = {"id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b","created_at": "2021-03-11T11:34:00.402075","updated_at": "null","businessID": 36574564,"businessID": "business1", "topic": "test1", "networkID": 1, "tenantID": "tenant1", "referenceID": "reference1", "resourceID": "resource1","timestampStart": "2021-03-11T11:34:00","timestampEnd": "null","metrics": [{"metricName": "cpu_utilization","metricType": "float","aggregationMethod": "agg","step": "1h","step_aggregation": "5m"}],"status": 1}
+json_response_enable = {"id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b","created_at": "2021-03-11T11:34:00.402075","updated_at": "null","businessID": 36574564,"businessID": "business1", "topic": "test1", "networkID": 1, "tenantID": "tenant1", "referenceID": "reference1", "resourceID": "resource1","timestampStart": "2021-03-11T11:35:00","timestampEnd": "null","metrics": [{"metricName": "cpu_utilization","metricType": "float","aggregationMethod": "sum","step": "15min","step_aggregation": "1h", "next_run_at": "2021-03-11T11:45:00", "next_aggregation": "2021-03-11T12:35:00"}],"status": 1}
 json_response_disable = json_response_enable.copy()
 json_response_disable['status'] = 0
 
@@ -91,7 +101,7 @@ step_options = ['s', 'm', 'h', 'd', 'w']
 
 wait_queue = PriorityQueue()
 metrics_queue = PriorityQueue()
-num_fetch_threads = 100
+num_fetch_threads = 20
 first_metric_aux = None
 update_queue_flag = False
 
@@ -113,16 +123,16 @@ def send_kafka(data, dataHash, kafka_topic):
   try:
     payload_encoded = {k: str(v).encode('utf-8') for k, v in dataHash.items()}
     hashData = {k: hashlib.sha256(v).hexdigest() for k,v in payload_encoded.items()}
-    info_log(None, f'Raw Data: {data} \nHashed Data: {hashData}')
+    #info_log(None, f'Raw Data: {data} \nHashed Data: {hashData}')
   
     public_key, private_key = rsa.newkeys(1024)
   
     dataHashEncrypt = {rsa.encrypt(k.encode(), private_key): rsa.encrypt(v.encode(), private_key) for k,v in hashData.items()}
-    info_log(None, f'Signup Data: {dataHashEncrypt}')
+    #info_log(None, f'Signup Data: {dataHashEncrypt}')
   
     producer = KafkaProducer(bootstrap_servers=[KAFKA_HOST+':'+KAFKA_PORT], value_serializer=lambda x: json.dumps(x).encode('utf-8'), api_version=(0,10,1))
     producer.send(kafka_topic, key=list(dataHashEncrypt.values())[0],  value=data)
-    info_log(200, f'Post Data into DL Kafka Topic {kafka_topic}')
+    info_log(200, f'Post metric {data["monitoringData"]["metricName"]}, from operator {data["operatorID"]}, into DL Kafka Topic {kafka_topic} [Post Time: {data["monitoringData"]["timestamp"]}]')
     return 1
   except Exception as e:
     info_log(400, 'Erro in request_orchestrator: ' + str(e))
@@ -213,14 +223,15 @@ def queue_consumer(i, q):
     while True:
       next_item = q.get()
       info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {i})')
-      info_log(None, f'{datetime.datetime.now()} - UC1: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]})')
       
       if next_item[16] == 1:
         #Send aggregation
+        info_log(None, f'{datetime.datetime.now()} - UC1: Aggregating values from metric: {next_item[5]} (Step Aggregation Associated: {next_item[14]})')
         send_aggregation(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[14])
       else:
         #Send metric
         request_orchestrator(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4])
+        info_log(None, f'{datetime.datetime.now()} - UC2: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]}')
         update_next_run(next_item[4])
       
       update_queue_flag = True
@@ -250,6 +261,7 @@ for i in range(num_fetch_threads):
 
 # Check waiting metrics
 tl = Timeloop()
+logging.getLogger("timeloop").setLevel(logging.CRITICAL)
 @tl.job(interval=timedelta(seconds=1))
 def check_waiting_metrics():
   global metrics_queue
@@ -320,6 +332,7 @@ async def set_param(config: Config_Model):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in create config in database."})
   update_queue_flag = True
+  info_log(200, f'Monitoring spec successfully created by operator {config.tenantID}')
   return resp
 
 @app.get("/settings/{config_id}", responses={200: {"model": Response_Config_Model,
@@ -372,7 +385,8 @@ async def update_config_id(config_id, config: Update_Config_Model):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp end must be superior to the actual."})
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in update config in database."})
-    update_queue_flag = True
+  update_queue_flag = True
+  info_log(200, f'Monitoring spec {config_id} successfully updated')
   return resp
 
 @app.put("/settings/{config_id}/enable", responses={200: {"model": Response_Config_Model,
@@ -394,6 +408,7 @@ async def enable_config_id(config_id):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in enable config in database."})
   update_queue_flag = True
+  info_log(200, f'Monitoring spec {config_id} successfully enabled')
   return resp
 
 @app.put("/settings/{config_id}/disable", responses={200: {"model": Response_Config_Model,
@@ -415,6 +430,7 @@ async def disable_config_id(config_id):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in disable config in database."})
   update_queue_flag = True
+  info_log(200, f'Monitoring spec {config_id} successfully disabled')
   return resp
 
 @app.delete("/settings/{config_id}", status_code=HTTP_204_NO_CONTENT, responses={404: {"model": Response_Error_Model,
@@ -431,4 +447,5 @@ async def delete_config_id(config_id):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in delete config in database."})
   update_queue_flag = True
+  info_log(200, f'Monitoring spec {config_id} successfully deleted')
   return Response(status_code=HTTP_204_NO_CONTENT)

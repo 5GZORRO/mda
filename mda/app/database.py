@@ -1,6 +1,6 @@
 from .main import *
 
-engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PW + '@' + POSTGRES_URL + '/' + POSTGRES_DB, pool_size=100, convert_unicode=True)
+engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PW + '@' + POSTGRES_URL + '/' + POSTGRES_DB, pool_size=num_fetch_threads, convert_unicode=True)
 # Create database if it does not exist.
 if not database_exists(engine.url):
   create_database(engine.url)
@@ -100,6 +100,7 @@ def convert_to_seconds(s):
   return int(s[:-1]) * seconds_per_unit[s[-1]]
  
 def add_config(config: Config_Model):
+  global db_session
   global wait_queue
   try:
     row = Config(config.businessID, config.topic, config.networkID, config.timestampStart, config.timestampEnd, config.tenantID, config.resourceID, config.referenceID)
@@ -164,6 +165,7 @@ def delete_metric_queue(metric_id):
   return
 
 def update_config(config_id, config):
+  global db_session
   global wait_queue
   try:
     row = Config.query.filter_by(_id=config_id).first()
@@ -208,6 +210,7 @@ def update_config(config_id, config):
     return -1
 
 def update_next_run(metric_id):
+  global db_session
   global wait_queue
   try:
     metric = Metric.query.filter_by(_id=metric_id).first()
@@ -233,6 +236,7 @@ def update_next_run(metric_id):
     return -1
 
 def update_aggregation(metric, config):
+  global db_session
   global wait_queue
   try:
     # Send aggregation
@@ -248,6 +252,7 @@ def update_aggregation(metric, config):
     return -1
 
 def enable_config(config_id):
+  global db_session
   global wait_queue
   try:
     config = Config.query.filter_by(_id=config_id).first()
@@ -270,6 +275,7 @@ def enable_config(config_id):
     return -1
 
 def disable_config(config_id):
+  global db_session
   global wait_queue
   try:
     config = Config.query.filter_by(_id=config_id).first()
@@ -293,6 +299,7 @@ def disable_config(config_id):
     return -1
 
 def delete_config(config_id):
+  global db_session
   global wait_queue
   try:
     config = Config.query.filter_by(_id=config_id).first()
@@ -313,6 +320,7 @@ def delete_config(config_id):
     return -1
 
 def load_database_metrics():
+  global db_session
   global wait_queue
   try:
     result = db_session.execute("SELECT next_run_at, metric_name, metric_type, aggregation_method, step, business_id, kafka_topic, network_id, " \
@@ -328,6 +336,7 @@ def load_database_metrics():
     return -1
 
 def insert_metric_value(metric_id, metric_value, timestamp):
+  global db_session
   try:
     row = Value(timestamp, metric_id, metric_value)
     db_session.add(row)
@@ -338,6 +347,7 @@ def insert_metric_value(metric_id, metric_value, timestamp):
     return -1
 
 def create_aggregate_view(metric_id, aggregation_method, step_aggregation):
+  global db_session
   db_session.execute("CREATE VIEW \"agg_"+str(metric_id)+"_"+aggregation_method+"\" " \
                      "WITH (timescaledb.continuous) AS " \
                      "SELECT time_bucket(\'"+step_aggregation+"\', timestamp) AS bucket, "+aggregation_method+"(metric_value) AS aggregation " \
@@ -353,6 +363,7 @@ def drop_aggregate_view(metric_id, aggregation_method):
   return
 
 def get_last_aggregation(metric_id, aggregation_method, bucket, step_aggregation):
+  global db_session
   #result = db_session.execute("REFRESH VIEW \"agg_"+str(metric_id)+"_"+aggregation_method+"\";" \
   #                            "SELECT * FROM \""+str(metric_id)+"_"+aggregation_method+"\" LIMIT 1;").fetchone()
   result = db_session.execute("SELECT "+aggregation_method+"(metric_value) " \
@@ -362,6 +373,7 @@ def get_last_aggregation(metric_id, aggregation_method, bucket, step_aggregation
   return result[0]
 
 def create_index():
+  global db_session
   #db_session.execute("CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;" \
   #                   "CREATE INDEX value_index ON value (timestamp ASC, metric_id);" \
   #                   "SELECT create_hypertable('value', 'timestamp', if_not_exists => TRUE);")
@@ -370,6 +382,7 @@ def create_index():
   return
 
 def drop_all_views():
+  global db_session
   result = db_session.execute("SELECT 'DROP VIEW \"' || table_name || '\" CASCADE;' " \
                               "FROM information_schema.views " \
                               "WHERE table_schema NOT IN ('pg_catalog', 'information_schema') AND " \
@@ -383,6 +396,7 @@ def drop_all_views():
   return
 
 def close_connection():
+  global db_session
   db_session.remove()
   return
   

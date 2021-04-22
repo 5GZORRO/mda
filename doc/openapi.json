@@ -32,14 +32,17 @@
                               "tenantID":"tenant1",
                               "referenceID":"reference1",
                               "resourceID":"resource1",
-                              "timestampStart":"2021-03-11T11:34:00",
+                              "timestampStart":"2021-03-11T11:35:00",
                               "timestampEnd":"null",
                               "metrics":[
                                  {
                                     "metricName":"cpu_utilization",
                                     "metricType":"float",
-                                    "aggregationMethod":"agg",
-                                    "step":"1h"
+                                    "aggregationMethod":"sum",
+                                    "step":"15min",
+                                    "step_aggregation":"1h",
+                                    "next_run_at":"2021-03-11T11:45:00",
+                                    "next_aggregation":"2021-03-11T12:35:00"
                                  }
                               ],
                               "status":1
@@ -95,14 +98,17 @@
                            "tenantID":"tenant1",
                            "referenceID":"reference1",
                            "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampStart":"2021-03-11T11:35:00",
                            "timestampEnd":"null",
                            "metrics":[
                               {
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
-                                 "aggregationMethod":"agg",
-                                 "step":"1h"
+                                 "aggregationMethod":"sum",
+                                 "step":"15min",
+                                 "step_aggregation":"1h",
+                                 "next_run_at":"2021-03-11T11:45:00",
+                                 "next_aggregation":"2021-03-11T12:35:00"
                               }
                            ],
                            "status":1
@@ -169,14 +175,17 @@
                            "tenantID":"tenant1",
                            "referenceID":"reference1",
                            "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampStart":"2021-03-11T11:35:00",
                            "timestampEnd":"null",
                            "metrics":[
                               {
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
-                                 "aggregationMethod":"agg",
-                                 "step":"1h"
+                                 "aggregationMethod":"sum",
+                                 "step":"15min",
+                                 "step_aggregation":"1h",
+                                 "next_run_at":"2021-03-11T11:45:00",
+                                 "next_aggregation":"2021-03-11T12:35:00"
                               }
                            ],
                            "status":1
@@ -251,14 +260,17 @@
                            "tenantID":"tenant1",
                            "referenceID":"reference1",
                            "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampStart":"2021-03-11T11:35:00",
                            "timestampEnd":"null",
                            "metrics":[
                               {
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
-                                 "aggregationMethod":"agg",
-                                 "step":"1h"
+                                 "aggregationMethod":"sum",
+                                 "step":"15min",
+                                 "step_aggregation":"1h",
+                                 "next_run_at":"2021-03-11T11:45:00",
+                                 "next_aggregation":"2021-03-11T12:35:00"
                               }
                            ],
                            "status":1
@@ -368,14 +380,17 @@
                            "tenantID":"tenant1",
                            "referenceID":"reference1",
                            "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampStart":"2021-03-11T11:35:00",
                            "timestampEnd":"null",
                            "metrics":[
                               {
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
-                                 "aggregationMethod":"agg",
-                                 "step":"1h"
+                                 "aggregationMethod":"sum",
+                                 "step":"15min",
+                                 "step_aggregation":"1h",
+                                 "next_run_at":"2021-03-11T11:45:00",
+                                 "next_aggregation":"2021-03-11T12:35:00"
                               }
                            ],
                            "status":1
@@ -442,14 +457,17 @@
                            "tenantID":"tenant1",
                            "referenceID":"reference1",
                            "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:34:00",
+                           "timestampStart":"2021-03-11T11:35:00",
                            "timestampEnd":"null",
                            "metrics":[
                               {
                                  "metricName":"cpu_utilization",
                                  "metricType":"float",
-                                 "aggregationMethod":"agg",
-                                 "step":"1h"
+                                 "aggregationMethod":"sum",
+                                 "step":"15min",
+                                 "step_aggregation":"1h",
+                                 "next_run_at":"2021-03-11T11:45:00",
+                                 "next_aggregation":"2021-03-11T12:35:00"
                               }
                            ],
                            "status":0
@@ -534,8 +552,7 @@
                "timestampStart":{
                   "title":"Timestampstart",
                   "type":"string",
-                  "format":"date-time",
-                  "default":"2021-04-07T10:12:14.481898"
+                  "format":"date-time"
                },
                "timestampEnd":{
                   "title":"Timestampend",
@@ -574,16 +591,16 @@
                   "title":"Metrictype",
                   "type":"string"
                },
-               "aggregationMethod":{
-                  "title":"Aggregationmethod",
-                  "type":"string"
-               },
                "step":{
                   "title":"Step",
                   "type":"string"
                },
-               "next_run_at":{
-                  "title":"Next Run At",
+               "aggregationMethod":{
+                  "title":"Aggregationmethod",
+                  "type":"string"
+               },
+               "step_aggregation":{
+                  "title":"Step Aggregation",
                   "type":"string"
                }
             }
@@ -598,7 +615,6 @@
                "topic",
                "networkID",
                "timestampStart",
-               "timestampEnd",
                "metrics",
                "status",
                "tenantID",
@@ -648,7 +664,7 @@
                   "title":"Metrics",
                   "type":"array",
                   "items":{
-                     "$ref":"#/components/schemas/Metric_Model"
+                     "$ref":"#/components/schemas/Response_Metric_Model"
                   }
                },
                "status":{
@@ -684,6 +700,48 @@
                "message":{
                   "title":"Message",
                   "type":"string"
+               }
+            }
+         },
+         "Response_Metric_Model":{
+            "title":"Response_Metric_Model",
+            "required":[
+               "metricName",
+               "metricType",
+               "step",
+               "next_run_at"
+            ],
+            "type":"object",
+            "properties":{
+               "metricName":{
+                  "title":"Metricname",
+                  "type":"string"
+               },
+               "metricType":{
+                  "title":"Metrictype",
+                  "type":"string"
+               },
+               "step":{
+                  "title":"Step",
+                  "type":"string"
+               },
+               "aggregationMethod":{
+                  "title":"Aggregationmethod",
+                  "type":"string"
+               },
+               "step_aggregation":{
+                  "title":"Step Aggregation",
+                  "type":"string"
+               },
+               "next_run_at":{
+                  "title":"Next Run At",
+                  "type":"string",
+                  "format":"date-time"
+               },
+               "next_aggregation":{
+                  "title":"Next Aggregation",
+                  "type":"string",
+                  "format":"date-time"
                }
             }
          },
