@@ -1,7 +1,7 @@
 version: '2'
 services:
   vs:
-    #image: docker.pkg.github.com/5gzorro/mda/vs_testing:latest
+    #image: docker.pkg.github.com/5gzorro/mda/vs_dummy:latest
     build: ./dummy_vs_connector
     ports:
       - "3700:3700"
@@ -14,7 +14,7 @@ services:
         ipv4_address: 172.253.1.0
       
   osm:
-    #image: docker.pkg.github.com/5gzorro/mda/osm_testing:latest
+    #image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
     build: ./dummy_osm_connector
     ports:
       - "4500:4500"
@@ -25,7 +25,7 @@ services:
         ipv4_address: 172.253.1.2
 
   mda:
-    #image: docker.pkg.github.com/5gzorro/mda/mda_testing:latest
+    #image: docker.pkg.github.com/5gzorro/mda/mda_production:latest
     build: ./mda
     env_file:
       - ./.env
