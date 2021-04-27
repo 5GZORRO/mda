@@ -59,6 +59,9 @@ $ docker-compose -f docker-compose-production.yml up --build
 ```
 $ docker-compose -f docker-compose-production.yml up --build <component_name>
 ```
+### Persistence detail
+
+In case MDA goes down when the reload occurs, it is standard to have data loss (no requests were made to the data source for the period that the component was down). For the still-active monitoring specs when MDA reloads, the next run fields are updated accordingly with the current time and their steps.
 
 ## Development
 
