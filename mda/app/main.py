@@ -27,16 +27,20 @@ logging.getLogger("kafka").setLevel(logging.CRITICAL)
 try:
   POSTGRES_USER = os.environ["POSTGRES_USER"]
   POSTGRES_PW = os.environ["POSTGRES_PW"]
-  POSTGRES_URL = os.environ["POSTGRES_URL"]
+  POSTGRES_HOST = os.environ["POSTGRES_HOST"]
+  POSTGRES_PORT = os.environ["POSTGRES_PORT"]
   POSTGRES_DB = os.environ["POSTGRES_DB"]
   RESET_DB = os.environ["RESET_DB"]
   
   KAFKA_HOST = os.environ["KAFKA_HOST"]
   KAFKA_PORT = os.environ["KAFKA_PORT"]
   
+  NUM_READING_THREADS = int(os.environ["NUM_READING_THREADS"])
+  NUM_AGGREGATION_THREADS = int(os.environ["NUM_AGGREGATION_THREADS"])
+  
   #publicKeyOperator = os.environ["OPERATOR_PUBLIC_KEY"]
 except Exception as e:
-  print("Environment variable does not exists.")
+  print("Environment variable does not exists: " + str(e))
   sys.exit(0)
 
 class Metric_Model(BaseModel):
@@ -98,12 +102,19 @@ agg_options = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'STDDEV']
 
 step_options = ['s', 'm', 'h', 'd', 'w']
 
-
+# Metrics
 wait_queue = PriorityQueue()
 metrics_queue = PriorityQueue()
-num_fetch_threads = 20
+num_fetch_threads = NUM_READING_THREADS
 first_metric_aux = None
 update_queue_flag = False
+
+#Aggregations
+wait_queue_agg = PriorityQueue()
+aggregation_queue = PriorityQueue()
+num_fetch_threads_agg = NUM_AGGREGATION_THREADS
+first_aggregation_aux = None
+update_queue_flag_agg = False
 
 from .database import *
 
@@ -117,6 +128,15 @@ def update_first_metric_aux():
     return None
   aux = wait_queue.get()
   wait_queue.put(aux)
+  return aux[0]
+  
+# Update first aggregation to read
+def update_first_aggregation_aux():
+  global wait_queue_agg
+  if wait_queue_agg.empty():
+    return None
+  aux = wait_queue_agg.get()
+  wait_queue_agg.put(aux)
   return aux[0]
   
 def send_kafka(data, dataHash, kafka_topic):
@@ -217,24 +237,27 @@ def request_orchestrator(metric_name, resourceID, referenceID, next_run_at, tena
     return 0
 
 # Worker thread function
-def queue_consumer(i, q):
+def queue_consumer(i, q, f):
   global update_queue_flag
+  global update_queue_flag_agg
   try:
     while True:
       next_item = q.get()
       info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {i})')
       
-      if next_item[16] == 1:
+      if f == 1:
         #Send aggregation
         info_log(None, f'{datetime.datetime.now()} - UC1: Aggregating values from metric: {next_item[5]} (Step Aggregation Associated: {next_item[14]})')
         send_aggregation(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[14])
+        update_aggregation(next_item[4])
+        update_queue_flag_agg = True
       else:
         #Send metric
         request_orchestrator(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4])
         info_log(None, f'{datetime.datetime.now()} - UC2: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]}')
         update_next_run(next_item[4])
-      
-      update_queue_flag = True
+        update_queue_flag = True
+        
       q.task_done()
   except Exception as e:
     print(e)
@@ -250,12 +273,18 @@ def validate_uuid4(uuid_string):
 # Load database metrics to wait queue
 load_database_metrics()
 
-# Update first metric to read
+# Update first metric/aggregation to read
 first_metric_aux = update_first_metric_aux()
+first_aggregation_aux = update_first_aggregation_aux()
 
-# Set up threads to fetch the metrics
+# Set up threads
 for i in range(num_fetch_threads):
-	worker = Thread(target=queue_consumer, args=(i, metrics_queue,))
+	worker = Thread(target=queue_consumer, args=(i, metrics_queue, 0,))
+	worker.setDaemon(True)
+	worker.start()
+ 
+for i in range(num_fetch_threads_agg):
+	worker = Thread(target=queue_consumer, args=(i, aggregation_queue, 1,))
 	worker.setDaemon(True)
 	worker.start()
 
@@ -288,6 +317,35 @@ def check_waiting_metrics():
   return
 tl.start(block=False)
 
+# Check waiting metrics
+t2 = Timeloop()
+logging.getLogger("timeloop").setLevel(logging.CRITICAL)
+@t2.job(interval=timedelta(seconds=1))
+def check_waiting_aggregations():
+  global aggregation_queue
+  global wait_queue_agg
+  global update_queue_flag_agg
+  global first_aggregation_aux
+  '''print('RUN TIMELOOP')
+  print('aggregation_queue')
+  print(aggregation_queue.queue)
+  print('wait_queue_agg')
+  print(wait_queue_agg.queue)
+  print('update_queue_flag_agg')
+  print(update_queue_flag_agg)
+  print('first_aggregation_aux')
+  print(first_aggregation_aux)
+  print('now')
+  print(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))'''
+  if update_queue_flag_agg:
+    first_aggregation_aux = update_first_aggregation_aux()
+    update_queue_flag_agg = False
+  if first_aggregation_aux != None and str(first_aggregation_aux) <= str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")):
+    aggregation_queue.put(wait_queue_agg.get())
+    first_aggregation_aux = update_first_aggregation_aux()
+  return
+t2.start(block=False)
+
 # ----------------------- MAIN APP -------------------------------#
 # ----------------------------------------------------------------#
 
@@ -298,8 +356,12 @@ def shutdown_event():
   print('exit')
   global metrics_queue
   global wait_queue
-  wait_queue.join()
+  global aggregation_queue
+  global wait_queue_agg
   metrics_queue.join()
+  wait_queue.join()
+  wait_queue_aggregation.join()
+  aggregation_queue.join()
   #Close connection db
   close_connection()
   return
@@ -316,6 +378,7 @@ def shutdown_event():
 																	 "example": {"status": "Error", "message": "Error message."}}}}})
 async def set_param(config: Config_Model):
   global update_queue_flag
+  global update_queue_flag_agg
   for metric in config.metrics:
     if metric.aggregationMethod != None and metric.aggregationMethod.upper() not in agg_options:
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
@@ -332,6 +395,7 @@ async def set_param(config: Config_Model):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in create config in database."})
   update_queue_flag = True
+  update_queue_flag_agg = True
   info_log(200, f'Monitoring spec successfully created by operator {config.tenantID}')
   return resp
 
@@ -386,6 +450,7 @@ async def update_config_id(config_id, config: Update_Config_Model):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in update config in database."})
   update_queue_flag = True
+  update_queue_flag_agg = True
   info_log(200, f'Monitoring spec {config_id} successfully updated')
   return resp
 
@@ -408,6 +473,7 @@ async def enable_config_id(config_id):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in enable config in database."})
   update_queue_flag = True
+  update_queue_flag_agg = True
   info_log(200, f'Monitoring spec {config_id} successfully enabled')
   return resp
 
@@ -430,6 +496,7 @@ async def disable_config_id(config_id):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in disable config in database."})
   update_queue_flag = True
+  update_queue_flag_agg = True
   info_log(200, f'Monitoring spec {config_id} successfully disabled')
   return resp
 
@@ -447,5 +514,6 @@ async def delete_config_id(config_id):
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in delete config in database."})
   update_queue_flag = True
+  update_queue_flag_agg = True
   info_log(200, f'Monitoring spec {config_id} successfully deleted')
   return Response(status_code=HTTP_204_NO_CONTENT)

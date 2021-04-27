@@ -1,6 +1,6 @@
 from .main import *
 
-engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PW + '@' + POSTGRES_URL + '/' + POSTGRES_DB, pool_size=num_fetch_threads, convert_unicode=True)
+engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PW + '@' + POSTGRES_HOST + ':' + POSTGRES_PORT + '/' + POSTGRES_DB, pool_size=num_fetch_threads+num_fetch_threads_agg, convert_unicode=True)
 # Create database if it does not exist.
 if not database_exists(engine.url):
   create_database(engine.url)
@@ -102,6 +102,7 @@ def convert_to_seconds(s):
 def add_config(config: Config_Model):
   global db_session
   global wait_queue
+  global wait_queue_agg
   try:
     row = Config(config.businessID, config.topic, config.networkID, config.timestampStart, config.timestampEnd, config.tenantID, config.resourceID, config.referenceID)
     db_session.add(row)
@@ -115,10 +116,12 @@ def add_config(config: Config_Model):
       row_m = Metric(metric.metricName, metric.metricType, metric.aggregationMethod, metric.step, metric.step_aggregation, row._id, row.timestamp_start, aggregation)
       db_session.add(row_m)
       db_session.commit()
-      #Read metric
-      wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, 0))
-      #if row_m.aggregation_method != None:
-      #  create_aggregate_view(row_m._id, row_m.aggregation_method, row_m.step_aggregation)
+      
+      # Add to queue
+      wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation))
+      if row_m.aggregation_method != None:
+        wait_queue_agg.put((row_m.next_aggregation, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation))
+      
       response['metrics'].append(row_m.toString())
     return response
   except Exception as e:
@@ -154,6 +157,7 @@ def get_configs():
 
 def delete_metric_queue(metric_id):
   global wait_queue
+  global wait_queue_agg
   index = True
   while(index):
     index = False
@@ -162,11 +166,17 @@ def delete_metric_queue(metric_id):
         del wait_queue.queue[i]
         index = True
         break
+    for i in range(len(wait_queue_agg.queue)):
+      if wait_queue_agg.queue[i][4] == metric_id:
+        del wait_queue_agg.queue[i]
+        index = True
+        break
   return
 
 def update_config(config_id, config):
   global db_session
   global wait_queue
+  global wait_queue_agg
   try:
     row = Config.query.filter_by(_id=config_id).first()
     if row == None:
@@ -177,7 +187,8 @@ def update_config(config_id, config):
     if config.timestampEnd != None and row.timestamp_end != None and config.timestampEnd <= row.timestamp_end:
       return 2
       
-    row.updated_at = datetime.datetime.now()
+    now = datetime.datetime.now()
+    row.updated_at = now
     # Update config
     if config.timestampEnd != None:
       row.timestamp_end = config.timestampEnd
@@ -187,7 +198,6 @@ def update_config(config_id, config):
     # Delete old metrics
     metrics = Metric.query.filter_by(config_id=config_id).all()
     for metric in metrics:
-      #drop_aggregate_view(metric._id, metric.aggregation_method)
       delete_metric_queue(metric._id)
       db_session.delete(metric)
     
@@ -197,12 +207,15 @@ def update_config(config_id, config):
         aggregation = None
         if metric.step_aggregation != None:
           sec_to_add = convert_to_seconds(metric.step_aggregation)
-          aggregation = row.timestamp_start + relativedelta(seconds=sec_to_add)
-        row_m = Metric(metric.metricName, metric.metricType, metric.aggregationMethod, metric.step, metric.step_aggregation, row._id, row.timestamp_start, aggregation)
+          aggregation = now + relativedelta(seconds=sec_to_add)
+        row_m = Metric(metric.metricName, metric.metricType, metric.aggregationMethod, metric.step, metric.step_aggregation, row._id, now, aggregation)
         db_session.add(row_m)
         db_session.commit()
+        # Add to queue
+        wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation))
+        if row_m.aggregation_method != None:
+          wait_queue_agg.put((row_m.next_aggregation, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation))
         response['metrics'].append(row_m.toString())
-        wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, 0))
       return response
     return get_config(config_id)
   except Exception as e:
@@ -216,8 +229,7 @@ def update_next_run(metric_id):
     metric = Metric.query.filter_by(_id=metric_id).first()
     config = Config.query.filter_by(_id=metric.config_id).first()
     sec_to_add = convert_to_seconds(metric.step)
-    old = metric.next_run_at
-    next = old + relativedelta(seconds=sec_to_add)
+    next = metric.next_run_at + relativedelta(seconds=sec_to_add)
     if config.timestamp_end != None and next > config.timestamp_end:
       metric.status = 0
       db_session.commit()
@@ -225,35 +237,38 @@ def update_next_run(metric_id):
       metric.next_run_at = next
       db_session.commit()
       if metric.status == 1:
-        wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation, 0))
-        
-    #Send aggregation
-    if next >= metric.next_aggregation:
-      update_aggregation(metric, config)
+        wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
     return 1
   except Exception as e:
-    #print(e)
+    print(e)
     return -1
 
-def update_aggregation(metric, config):
+def update_aggregation(metric_id):
   global db_session
-  global wait_queue
+  global wait_queue_agg
   try:
-    # Send aggregation
-    wait_queue.put((metric.next_aggregation, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation, 1))
-    # Update next_aggregation
+    metric = Metric.query.filter_by(_id=metric_id).first()
+    config = Config.query.filter_by(_id=metric.config_id).first()
     sec_to_add = convert_to_seconds(metric.step_aggregation)
     next = metric.next_aggregation + relativedelta(seconds=sec_to_add)
-    metric.next_aggregation = next
-    db_session.commit()
+    if config.timestamp_end != None and next > config.timestamp_end:
+      metric.status = 0
+      db_session.commit()
+    else:
+      metric.next_aggregation = next
+      db_session.commit()
+      if metric.status == 1:
+        # Send aggregation
+        wait_queue_agg.put((metric.next_aggregation, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
     return 1
   except Exception as e:
-    #print(e)
+    print(e)
     return -1
 
 def enable_config(config_id):
   global db_session
   global wait_queue
+  global wait_queue_agg
   try:
     config = Config.query.filter_by(_id=config_id).first()
     if config == None or (config.timestamp_end != None and config.timestamp_end < datetime.datetime.now()):
@@ -261,14 +276,20 @@ def enable_config(config_id):
     if config.status == 1:
       return 1
     config.status = 1
-    config.updated_at = datetime.datetime.now()
+    now = datetime.datetime.now()
+    config.updated_at = now
     add_metrics = config.toString()
     metrics = Metric.query.filter_by(config_id=config._id).all()
     for metric in metrics:
       metric.status = 1
-      db_session.commit()
+      metric.next_run_at = now
+      wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
+      if metric.aggregation_method != None:
+        sec_to_add = convert_to_seconds(metric.step_aggregation)
+        metric.next_aggregation = now + relativedelta(seconds=sec_to_add)
+        wait_queue_agg.put((metric.next_aggregation, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
       add_metrics['metrics'].append(metric.toString())
-      wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation, 0))
+      db_session.commit()
     return add_metrics
   except Exception as e:
     print(e)
@@ -277,6 +298,7 @@ def enable_config(config_id):
 def disable_config(config_id):
   global db_session
   global wait_queue
+  global wait_queue_agg
   try:
     config = Config.query.filter_by(_id=config_id).first()
     if config == None:
@@ -288,7 +310,6 @@ def disable_config(config_id):
     add_metrics = config.toString()
     metrics = Metric.query.filter_by(config_id=config._id).all()
     for metric in metrics:
-      #drop_aggregate_view(metric._id, metric.aggregation_method)
       metric.status = 0
       add_metrics['metrics'].append(metric.toString())
       delete_metric_queue(metric._id)
@@ -301,6 +322,7 @@ def disable_config(config_id):
 def delete_config(config_id):
   global db_session
   global wait_queue
+  global wait_queue_agg
   try:
     config = Config.query.filter_by(_id=config_id).first()
     if config == None:
@@ -308,7 +330,6 @@ def delete_config(config_id):
     metrics = Metric.query.filter_by(config_id=config._id).all()
 
     for metric in metrics:
-      #drop_aggregate_view(metric._id, metric.aggregation_method)
       delete_metric_queue(metric._id)
       db_session.delete(metric)
       
@@ -322,14 +343,31 @@ def delete_config(config_id):
 def load_database_metrics():
   global db_session
   global wait_queue
+  global wait_queue_agg
   try:
+    # Update old metrics and next executions
+    now = datetime.datetime.now()
+    db_session.execute("UPDATE config " \
+                       "SET status = 0 " \
+                       "WHERE status = 1 AND timestamp_end < '"+str(now)+"'; " \
+
+                       "UPDATE metric " \
+                       "SET next_run_at = '"+str(now)+"', " \
+                           "next_aggregation = CASE WHEN aggregation_method is not null " \
+                                                   "THEN '"+str(now)+"'::timestamp + step_aggregation::interval END " \
+                       "FROM config c " \
+                       "WHERE c.status = 1 AND next_run_at < '"+str(now)+"';");
+    db_session.commit()
+    # Get metrics
     result = db_session.execute("SELECT next_run_at, metric_name, metric_type, aggregation_method, step, business_id, kafka_topic, network_id, " \
                                        "tenant_id, resource_id, reference_id, timestamp_start, timestamp_end, metric._id, step_aggregation, " \
                                        "next_aggregation " \
                                 "FROM metric join config on metric.config_id = config._id " \
                                 "WHERE metric.status = 1;")
     for row in result:
-      wait_queue.put((row['next_run_at'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['business_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation'], 0))
+      wait_queue.put((row['next_run_at'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['business_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation']))
+      if row['aggregation_method'] != None:
+        wait_queue_agg.put((row['next_aggregation'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['business_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation']))
     return 1
   except Exception as e:
     print(e)
@@ -346,6 +384,7 @@ def insert_metric_value(metric_id, metric_value, timestamp):
     print(e)
     return -1
 
+'''
 def create_aggregate_view(metric_id, aggregation_method, step_aggregation):
   global db_session
   db_session.execute("CREATE VIEW \"agg_"+str(metric_id)+"_"+aggregation_method+"\" " \
@@ -361,6 +400,7 @@ def drop_aggregate_view(metric_id, aggregation_method):
   db_session.execute("DROP VIEW IF EXISTS \"agg_"+str(metric_id)+"_"+aggregation_method+"\" CASCADE;")
   db_session.commit()
   return
+'''
 
 def get_last_aggregation(metric_id, aggregation_method, bucket, step_aggregation):
   global db_session
@@ -381,6 +421,7 @@ def create_index():
   db_session.commit()
   return
 
+'''
 def drop_all_views():
   global db_session
   result = db_session.execute("SELECT 'DROP VIEW \"' || table_name || '\" CASCADE;' " \
@@ -394,6 +435,7 @@ def drop_all_views():
       pass
   db_session.commit()
   return
+'''
 
 def close_connection():
   global db_session
@@ -412,7 +454,6 @@ if RESET_DB.lower() == 'true':
   try:
     try:
       db_session.commit()
-      #drop_all_views()
       Base.metadata.drop_all(bind=engine)
     except Exception as e:
       print(e)
@@ -427,7 +468,7 @@ if RESET_DB.lower() == 'true':
 try:
   resp1 = Config.query.first()
   resp2 = Metric.query.first()
-  resp2 = Value.query.first()
+  resp3 = Value.query.first()
 except Exception as e:
   try:
     Base.metadata.create_all(bind=engine)
