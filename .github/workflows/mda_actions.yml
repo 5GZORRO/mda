@@ -8,11 +8,11 @@ env:
   USER_SERVER: ubuntu
   REPOSITORY_NAME: mda
   REPOSITORY_NAME_LC: mda
-  PACKAGE_MDA_NAME: mda
-  IMAGE_MDA_NAME: mda
-  PACKAGE_OSM_NAME: osm_testing
+  PACKAGE_MDA_NAME: mda_production
+  IMAGE_MDA_NAME: mda_prod
+  PACKAGE_OSM_NAME: osm_dummy
   IMAGE_OSM_NAME: osm_test
-  PACKAGE_VS_NAME: vs_testing
+  PACKAGE_VS_NAME: vs_dummy
   IMAGE_VS_NAME: vs_test
 
 jobs:
