@@ -11,6 +11,7 @@ items:
         io.kompose.service: mda
       name: mda
     spec:
+      type: NodePort
       ports:
         - name: "4000"
           port: 4000
