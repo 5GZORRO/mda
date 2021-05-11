@@ -80,21 +80,19 @@ class Update_Config_Model(BaseModel):
   metrics: Optional[List[Metric_Model]] = None
 
 class Response_Config_Model(BaseModel):
-  id: uuid.UUID
-  created_at: datetime.datetime
-  updated_at: datetime.datetime
-  business_id: str
-  monitoring_endpoint: str
-  topic: str
-  resource_id: str
-  network_id: str
-  parent_id: str
-  timestamp_start: datetime.datetime
-  timestamp_end: Optional[datetime.datetime] = None	
-  metrics: List[Response_Metric_Model]
-  status: int
-  tenant_id: str
-  reference_id: str
+	id: uuid.UUID
+	created_at: datetime.datetime
+	updated_at: datetime.datetime
+	business_id: str
+        monitoring_endpoint: str
+	topic: str
+        context_ids: List[Context_Model]
+	timestamp_start: datetime.datetime
+	timestamp_end: Optional[datetime.datetime] = None
+	metrics: List[Response_Metric_Model]
+	status: int
+	tenant_id: str
+	reference_id: str
 
 class Response_Error_Model(BaseModel):
 	status: str
@@ -443,24 +441,23 @@ async def set_param(config: Config_Model):
   global update_queue_flag
   global update_queue_flag_agg
   for metric in config.metrics:
-    if metric.aggregation_method != None and metric.aggregation_method.upper() not in agg_options:
+    if metric.aggregationMethod != None and metric.aggregationMethod.upper() not in agg_options:
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
     if metric.step_aggregation != None and metric.step_aggregation[-1] not in step_options and metric.step[-1] not in step_options:
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Step and step aggregation options is "+str(step_options)+"."})
-  if config.timestamp_start == None:
-    config.timestamp_start = datetime.datetime.now()
-  elif config.timestamp_start < datetime.datetime.now() - relativedelta(minutes=1):
+  if config.timestampStart == None:
+    config.timestampStart = datetime.datetime.now()
+  elif config.timestampStart < datetime.datetime.now() - relativedelta(minutes=1):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after current now."})
-  if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
+  if config.timestampEnd != None and config.timestampStart > config.timestampEnd:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
   # Save config in database
   resp = add_config(config)
-  print(resp)
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in create config in database."})
   update_queue_flag = True
   update_queue_flag_agg = True
-  info_log(200, f'Monitoring spec successfully created by operator {config.tenant_id}')
+  info_log(200, f'Monitoring spec successfully created by operator {config.tenantID}')
   return resp
 
 @app.get("/settings/{config_id}", responses={200: {"model": Response_Config_Model,

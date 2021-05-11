@@ -15,16 +15,18 @@ class Config(Base):
   updated_at = Column(DateTime, nullable=True)
   business_id = Column(String(256), nullable=False)
   kafka_topic = Column(String(256), nullable=False)
-  network_id = Column(String(256), nullable=False)
+  monitoring_endpoint = Column(String(256), nullable=False)
+  network_id = Column(String(256), nullable=True)
   tenant_id = Column(String(256), nullable=False)
   resource_id = Column(String(256), nullable=False)
+  parent_id = Column(String(256), nullable=True)
   reference_id = Column(String(256), nullable=False)
   timestamp_start = Column(DateTime, nullable=False)
   timestamp_end = Column(DateTime, nullable=True)
   status = Column(Integer, default=1)
   metrics = relationship("Metric")
 
-  def __init__(self, business_id, kafka_topic, network_id, timestamp_start, timestamp_end, tenant_id, resource_id, reference_id):
+  def __init__(self, business_id, kafka_topic, network_id, timestamp_start, timestamp_end, tenant_id, resource_id, reference_id, parent_id, monitoring_endpoint):
     self.business_id = business_id
     self.kafka_topic = kafka_topic
     self.network_id = network_id
@@ -33,20 +35,24 @@ class Config(Base):
     self.tenant_id = tenant_id
     self.resource_id = resource_id
     self.reference_id = reference_id
+    self.parent_id = parent_id
+    self.monitoring_endpoint = monitoring_endpoint
         
   def toString(self):
     return ({'id': self._id,
              'created_at': self.created_at,
              'updated_at': self.updated_at,
-             'businessID': self.business_id,
+             'business_id': self.business_id,
              'topic': self.kafka_topic,
-             'networkID': self.network_id,
-             'timestampStart': self.timestamp_start,
-             'timestampEnd': self.timestamp_end,
+             'monitoring_endpoint': self.monitoring_endpoint,
+             'network_id': self.network_id,
+             'timestamp_start': self.timestamp_start,
+             'timestamp_end': self.timestamp_end,
              'metrics': [],
              'status': self.status,
              'tenant_id' : self.tenant_id,
              'resource_id' : self.resource_id,
+             'parent_id' : self.parent_id,
              'reference_id' : self.reference_id})
 
 class Metric(Base):
@@ -74,9 +80,9 @@ class Metric(Base):
     self.next_aggregation = next_aggregation
         
   def toString(self):
-    return ({'metricName': self.metric_name,
-             'metricType': self.metric_type,
-             'aggregationMethod': self.aggregation_method,
+    return ({'metric_name': self.metric_name,
+             'metric_type': self.metric_type,
+             'aggregation_method': self.aggregation_method,
              'step': self.step,
              'step_aggregation': self.step_aggregation,
              'next_run_at': self.next_run_at,
@@ -104,16 +110,18 @@ def add_config(config: Config_Model):
   global wait_queue
   global wait_queue_agg
   try:
-    row = Config(config.businessID, config.topic, config.networkID, config.timestampStart, config.timestampEnd, config.tenantID, config.resourceID, config.referenceID)
+    print(config.context_ids[0])
+    row = Config(config.business_id, config.topic, config.context_ids[0].network_slice_id, config.timestamp_start, config.timestamp_end, config.tenant_id, config.context_ids[0].resource_id, config.reference_id, config.context_ids[0].parent_id, config.monitoring_endpoint)
     db_session.add(row)
     db_session.commit()
     response = row.toString()
+    print(response)
     for metric in config.metrics:
       aggregation = None
       if metric.step_aggregation != None:
         sec_to_add = convert_to_seconds(metric.step_aggregation)
         aggregation = row.timestamp_start + relativedelta(seconds=sec_to_add)
-      row_m = Metric(metric.metricName, metric.metricType, metric.aggregationMethod, metric.step, metric.step_aggregation, row._id, row.timestamp_start, aggregation)
+      row_m = Metric(metric.metric_name, metric.metric_type, metric.aggregation_method, metric.step, metric.step_aggregation, row._id, row.timestamp_start, aggregation)
       db_session.add(row_m)
       db_session.commit()
       
@@ -158,6 +166,8 @@ def get_configs():
 def delete_metric_queue(metric_id):
   global wait_queue
   global wait_queue_agg
+  global metrics_queue
+  global aggregation_queue
   index = True
   while(index):
     index = False
@@ -171,6 +181,16 @@ def delete_metric_queue(metric_id):
         del wait_queue_agg.queue[i]
         index = True
         break
+    for i in range(len(metrics_queue.queue)):
+      if metrics_queue.queue[i][4] == metric_id:
+        del metrics_queue.queue[i]
+        index = True
+        break
+    for i in range(len(aggregation_queue.queue)):
+      if aggregation_queue.queue[i][4] == metric_id:
+        del aggregation_queue.queue[i]
+        index = True
+        break
   return
 
 def update_config(config_id, config):
@@ -181,17 +201,17 @@ def update_config(config_id, config):
     row = Config.query.filter_by(_id=config_id).first()
     if row == None:
       return 0
-    if config.timestampEnd == None and config.metrics == None:
+    if config.timestamp_end == None and config.metrics == None:
       return 1
       
-    if config.timestampEnd != None and row.timestamp_end != None and config.timestampEnd <= row.timestamp_end:
+    if config.timestamp_end != None and row.timestamp_end != None and config.timestamp_end <= row.timestamp_end:
       return 2
       
     now = datetime.datetime.now()
     row.updated_at = now
     # Update config
-    if config.timestampEnd != None:
-      row.timestamp_end = config.timestampEnd
+    if config.timestamp_end != None:
+      row.timestamp_end = config.timestamp_end
     db_session.commit()
     response = row.toString()
     # Update metrics
@@ -208,7 +228,7 @@ def update_config(config_id, config):
         if metric.step_aggregation != None:
           sec_to_add = convert_to_seconds(metric.step_aggregation)
           aggregation = now + relativedelta(seconds=sec_to_add)
-        row_m = Metric(metric.metricName, metric.metricType, metric.aggregationMethod, metric.step, metric.step_aggregation, row._id, now, aggregation)
+        row_m = Metric(metric.metric_name, metric.metric_type, metric.aggregation_method, metric.step, metric.step_aggregation, row._id, now, aggregation)
         db_session.add(row_m)
         db_session.commit()
         # Add to queue
@@ -222,44 +242,39 @@ def update_config(config_id, config):
     print(e)
     return -1
 
-def update_next_run(metric_id):
+def update_next_run(metric_id, next_run_at):
   global db_session
   global wait_queue
   try:
     metric = Metric.query.filter_by(_id=metric_id).first()
     config = Config.query.filter_by(_id=metric.config_id).first()
     sec_to_add = convert_to_seconds(metric.step)
-    next = metric.next_run_at + relativedelta(seconds=sec_to_add)
+    next = next_run_at + relativedelta(seconds=sec_to_add)
     if config.timestamp_end != None and next > config.timestamp_end:
       metric.status = 0
       db_session.commit()
     else:
       metric.next_run_at = next
       db_session.commit()
-      if metric.status == 1:
-        wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
     return 1
   except Exception as e:
     print(e)
     return -1
 
-def update_aggregation(metric_id):
+def update_aggregation(metric_id, next_aggregation):
   global db_session
   global wait_queue_agg
   try:
     metric = Metric.query.filter_by(_id=metric_id).first()
     config = Config.query.filter_by(_id=metric.config_id).first()
     sec_to_add = convert_to_seconds(metric.step_aggregation)
-    next = metric.next_aggregation + relativedelta(seconds=sec_to_add)
+    next = next_aggregation + relativedelta(seconds=sec_to_add)
     if config.timestamp_end != None and next > config.timestamp_end:
       metric.status = 0
       db_session.commit()
     else:
       metric.next_aggregation = next
       db_session.commit()
-      if metric.status == 1:
-        # Send aggregation
-        wait_queue_agg.put((metric.next_aggregation, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
     return 1
   except Exception as e:
     print(e)
