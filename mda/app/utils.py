@@ -31,7 +31,6 @@ def send_kafka(data, dataHash, kafka_topic):
     info_log(400, 'Erro in request_orchestrator: ' + str(e))
     return 0
 
-# Worker thread function
 def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator):
   try:
     while True:
@@ -40,15 +39,6 @@ def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator)
       if next_item[3] == None or next_item[0] <= next_item[3]:
         info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {thread_identifier})')
         if flag_agg == 1:
-
-def queue_consumer(i, q, f, orchestrator, aggregator):
-  try:
-    while True:
-      next_item = q.get()
-      
-      if next_item[3] == None or next_item[0] <= next_item[3]:
-        info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {i})')
-        if f == 1:
 
           #Send aggregation
           info_log(None, f'{datetime.datetime.now()} - UC1: Aggregating values from metric: {next_item[5]} (Step Aggregation Associated: {next_item[14]})')
