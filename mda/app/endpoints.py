@@ -151,4 +151,8 @@ async def delete_config_id(config_id):
   orchestrator.update_queue_flag = True
   aggregator.update_queue_flag_agg = True
   info_log(200, f'Monitoring spec {config_id} successfully deleted')
+<<<<<<< HEAD
   return Response(status_code=HTTP_204_NO_CONTENT)
+=======
+  return Response(status_code=HTTP_204_NO_CONTENT)
+>>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13

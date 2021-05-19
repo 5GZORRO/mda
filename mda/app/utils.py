@@ -32,6 +32,7 @@ def send_kafka(data, dataHash, kafka_topic):
     return 0
 
 # Worker thread function
+<<<<<<< HEAD
 def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator):
   try:
     while True:
@@ -40,6 +41,16 @@ def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator)
       if next_item[3] == None or next_item[0] <= next_item[3]:
         info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {thread_identifier})')
         if flag_agg == 1:
+=======
+def queue_consumer(i, q, f, orchestrator, aggregator):
+  try:
+    while True:
+      next_item = q.get()
+      
+      if next_item[3] == None or next_item[0] <= next_item[3]:
+        info_log(None, f'Start Fetching Values of Metric: {next_item[5]} (Thread Associated: {i})')
+        if f == 1:
+>>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
           #Send aggregation
           info_log(None, f'{datetime.datetime.now()} - UC1: Aggregating values from metric: {next_item[5]} (Step Aggregation Associated: {next_item[14]})')
           aggregator.send_aggregation(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[14])
@@ -51,7 +62,11 @@ def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator)
           info_log(None, f'{datetime.datetime.now()} - UC2: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]}')
           update_next_run(next_item[4], next_item[0])
 
+<<<<<<< HEAD
       queue.task_done()
+=======
+      q.task_done()
+>>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
   except Exception as e:
     print(e)
 
@@ -74,4 +89,8 @@ def delete_old_metric(metric_id, queue):
           del aggregator.aggregation_queue.queue[i]
           index = True
           break
+<<<<<<< HEAD
   return
+=======
+  return
+>>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
