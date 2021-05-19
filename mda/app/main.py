@@ -92,23 +92,18 @@ for i in range(num_fetch_threads_agg):
 	worker = Thread(target = queue_consumer, args = (i, aggregator.aggregation_queue, 1, orchestrator, aggregator))
 	worker.setDaemon(True)
 	worker.start()
-<<<<<<< HEAD
-'''
-=======
 
->>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
+'''
 # waiting for metrics and aggregations
 worker_metrics = Thread(target = orchestrator.check_waiting_metrics, args = ())
 worker_metrics.setDaemon(True)
 worker_metrics.start()
-<<<<<<< HEAD
 
 worker_aggregations = Thread(target = aggregator.check_waiting_aggregations, args = ())
 worker_aggregations.setDaemon(True)
 worker_aggregations.start()
 '''
 
-<<<<<<< HEAD
 # Check waiting metrics
 tl = Timeloop()
 logging.getLogger("timeloop").setLevel(logging.CRITICAL)
@@ -165,7 +160,7 @@ def check_waiting_aggregations():
 
   return
 t2.start(block=False)
-=======
+
 # waiting for metrics and aggregations
 worker_metrics = Thread(target = orchestrator.check_waiting_metrics, args = ())
 worker_metrics.setDaemon(True)
@@ -174,13 +169,6 @@ worker_metrics.start()
 worker_aggregations = Thread(target = aggregator.check_waiting_aggregations, args = ())
 worker_aggregations.setDaemon(True)
 worker_aggregations.start()
->>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
-=======
-
-worker_aggregations = Thread(target = aggregator.check_waiting_aggregations, args = ())
-worker_aggregations.setDaemon(True)
-worker_aggregations.start()
->>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
 
 # ----------------------- MAIN APP -------------------------------#
 # ----------------------------------------------------------------#
@@ -201,12 +189,4 @@ def shutdown_event():
 # ----------------- REST FASTAPI METHODS -------------------------#
 # ----------------------------------------------------------------#
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 from .endpoints import *
-=======
-from .endpoints import *
->>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
-=======
-from .endpoints import *
->>>>>>> dd49afda5b88a677ffeeb1d0252ab8efd59f6e13
