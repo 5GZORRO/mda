@@ -161,15 +161,6 @@ def check_waiting_aggregations():
   return
 t2.start(block=False)
 
-# waiting for metrics and aggregations
-worker_metrics = Thread(target = orchestrator.check_waiting_metrics, args = ())
-worker_metrics.setDaemon(True)
-worker_metrics.start()
-
-worker_aggregations = Thread(target = aggregator.check_waiting_aggregations, args = ())
-worker_aggregations.setDaemon(True)
-worker_aggregations.start()
-
 # ----------------------- MAIN APP -------------------------------#
 # ----------------------------------------------------------------#
 

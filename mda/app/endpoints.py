@@ -24,7 +24,7 @@ async def set_param(config: Config_Model):
   if config.tenant_id not in public_private_keys:
     public_key, private_key = rsa.newkeys(1024)
     public_private_keys[config.tenant_id] = {"public_key": public_key, "private_key": private_key}
-
+  
   # Save config in database
   resp = add_config(config, orchestrator, aggregator)
   if resp == -1:
