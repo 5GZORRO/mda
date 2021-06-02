@@ -47,7 +47,7 @@ def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator)
         
         else:
           #Send metric
-          orchestrator.request_orchestrator(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4])
+          orchestrator.request_orchestrator(next_item[5], next_item[12], next_item[13], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[16])
           info_log(None, f'{datetime.datetime.now()} - UC2: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]}')
           update_next_run(next_item[4], next_item[0])
 
