@@ -101,6 +101,7 @@ class Value(Base):
 
 # ----------------------------------------------------------------#
 seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
+mapping_data_source_query= {"OSM": OSM_QUERY, "spectrum": SPECTRUM_QUERY}
 
 def convert_to_seconds(s):
   return int(s[:-1]) * seconds_per_unit[s[-1]]
@@ -108,6 +109,7 @@ def convert_to_seconds(s):
 def add_config(config: Config_Model, orchestrator, aggregator):
 
   try:
+    config.monitoring_endpoint = config.monitoring_endpoint + mapping_data_source_query[config.data_source_type] 
     row = Config(config.business_id, config.topic, config.context_ids[0].network_slice_id, config.timestamp_start, config.timestamp_end, config.tenant_id, config.context_ids[0].resource_id, config.reference_id, config.context_ids[0].parent_id, config.monitoring_endpoint)
     db_session.add(row)
     db_session.commit()

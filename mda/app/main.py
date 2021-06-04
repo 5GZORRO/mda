@@ -40,8 +40,8 @@ try:
   NUM_READING_THREADS = int(os.environ["NUM_READING_THREADS"])
   NUM_AGGREGATION_THREADS = int(os.environ["NUM_AGGREGATION_THREADS"])
 
-  OSM_URL = os.environ["OSM_URL"]
-  
+  OSM_QUERY = os.environ["OSM_QUERY"]
+  SPECTRUM_QUERY = os.environ["SPECTRUM_QUERY"] 
   #publicKeyOperator = os.environ["OPERATOR_PUBLIC_KEY"]
 except Exception as e:
   print("Environment variable does not exists: " + str(e))

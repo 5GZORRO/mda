@@ -25,6 +25,7 @@ class Config_Model(BaseModel):
   business_id: str
   topic: str
   monitoring_endpoint: str
+  data_source_type: str
   tenant_id: str
   reference_id: str
   context_ids: List[Context_Model]
