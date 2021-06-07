@@ -41,27 +41,29 @@ class Orchestrator():
                 #Save value in db
                 insert_metric_value(metric_id, json_data["data"]["result"][0]["values"][0][1], next_run_at)
             else:
-                # Create JSON object that will be sent to DL Kafka Topic
-                monitoringData = {
-                    "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
-                    "metricValue" : json_data["data"]["result"][0]["values"][0][1],
-                    "resourceID" : resourceID,
-                    "referenceID" : referenceID,
-                    "timestamp" : str(next_run_at)
-                }
-                
-                dataHash = {
-                    "data" : monitoringData
-                }
-                
-                data = {
-                    "operatorID" : tenantID,
-                    "businessID" : businessID,
-                    "networkID" : networkID
-                }
-                data["monitoringData"] = monitoringData
-                send_kafka(data, dataHash, kafka_topic)
-                print('SEND DATA-> '+str(next_run_at)+' -> '+ str(json_data["data"]["result"][0]["values"][0][1]), flush=True)
+                if json_data["data"]["result"] != []:
+                    
+                    # Create JSON object that will be sent to DL Kafka Topic
+                    monitoringData = {
+                        "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
+                        "metricValue" : json_data["data"]["result"][0]["values"][0][1],
+                        "resourceID" : resourceID,
+                        "referenceID" : referenceID,
+                        "timestamp" : str(next_run_at)
+                    }
+                    
+                    dataHash = {
+                        "data" : monitoringData
+                    }
+                    
+                    data = {
+                        "operatorID" : tenantID,
+                        "businessID" : businessID,
+                        "networkID" : networkID
+                    }
+                    data["monitoringData"] = monitoringData
+                    send_kafka(data, dataHash, kafka_topic)
+                    print('SEND DATA-> '+str(next_run_at)+' -> '+ str(json_data["data"]["result"][0]["values"][0][1]), flush=True)
             return 1
 
         except Exception as e:
