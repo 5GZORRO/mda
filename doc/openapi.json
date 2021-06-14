@@ -508,39 +508,47 @@
          "Config_Model":{
             "title":"Config_Model",
             "required":[
-               "businessID",
+               "business_id",
                "topic",
-               "networkID",
-               "tenantID",
-               "resourceID",
-               "referenceID",
+               "monitoring_endpoint",
+               "data_source_type",
+               "tenant_id",
+               "reference_id",
+               "context_ids",
                "metrics"
             ],
             "type":"object",
             "properties":{
-               "businessID":{
-                  "title":"Businessid",
+               "business_id":{
+                  "title":"Business Id",
                   "type":"string"
                },
                "topic":{
                   "title":"Topic",
                   "type":"string"
                },
-               "networkID":{
-                  "title":"Networkid",
-                  "type":"integer"
-               },
-               "tenantID":{
-                  "title":"Tenantid",
+               "monitoring_endpoint":{
+                  "title":"Monitoring Endpoint",
                   "type":"string"
                },
-               "resourceID":{
-                  "title":"Resourceid",
+               "data_source_type":{
+                  "title":"Data Source Type",
                   "type":"string"
                },
-               "referenceID":{
-                  "title":"Referenceid",
+               "tenant_id":{
+                  "title":"Tenant Id",
                   "type":"string"
+               },
+               "reference_id":{
+                  "title":"Reference Id",
+                  "type":"string"
+               },
+               "context_ids":{
+                  "title":"Context Ids",
+                  "type":"array",
+                  "items":{
+                     "$ref":"#/components/schemas/Context_Model"
+                  }
                },
                "metrics":{
                   "title":"Metrics",
@@ -549,15 +557,36 @@
                      "$ref":"#/components/schemas/Metric_Model"
                   }
                },
-               "timestampStart":{
-                  "title":"Timestampstart",
+               "timestamp_start":{
+                  "title":"Timestamp Start",
                   "type":"string",
                   "format":"date-time"
                },
-               "timestampEnd":{
-                  "title":"Timestampend",
+               "timestamp_end":{
+                  "title":"Timestamp End",
                   "type":"string",
                   "format":"date-time"
+               }
+            }
+         },
+         "Context_Model":{
+            "title":"Context_Model",
+            "required":[
+               "resource_id"
+            ],
+            "type":"object",
+            "properties":{
+               "resource_id":{
+                  "title":"Resource Id",
+                  "type":"string"
+               },
+               "network_slice_id":{
+                  "title":"Network Slice Id",
+                  "type":"string"
+               },
+               "parent_id":{
+                  "title":"Parent Id",
+                  "type":"string"
                }
             }
          },
@@ -577,26 +606,26 @@
          "Metric_Model":{
             "title":"Metric_Model",
             "required":[
-               "metricName",
-               "metricType",
+               "metric_name",
+               "metric_type",
                "step"
             ],
             "type":"object",
             "properties":{
-               "metricName":{
-                  "title":"Metricname",
+               "metric_name":{
+                  "title":"Metric Name",
                   "type":"string"
                },
-               "metricType":{
-                  "title":"Metrictype",
+               "metric_type":{
+                  "title":"Metric Type",
                   "type":"string"
                },
                "step":{
                   "title":"Step",
                   "type":"string"
                },
-               "aggregationMethod":{
-                  "title":"Aggregationmethod",
+               "aggregation_method":{
+                  "title":"Aggregation Method",
                   "type":"string"
                },
                "step_aggregation":{
@@ -611,15 +640,17 @@
                "id",
                "created_at",
                "updated_at",
-               "businessID",
+               "business_id",
+               "monitoring_endpoint",
                "topic",
-               "networkID",
-               "timestampStart",
+               "resource_id",
+               "network_id",
+               "parent_id",
+               "timestamp_start",
                "metrics",
                "status",
-               "tenantID",
-               "resourceID",
-               "referenceID"
+               "tenant_id",
+               "reference_id"
             ],
             "type":"object",
             "properties":{
@@ -638,25 +669,37 @@
                   "type":"string",
                   "format":"date-time"
                },
-               "businessID":{
-                  "title":"Businessid",
+               "business_id":{
+                  "title":"Business Id",
+                  "type":"string"
+               },
+               "monitoring_endpoint":{
+                  "title":"Monitoring Endpoint",
                   "type":"string"
                },
                "topic":{
                   "title":"Topic",
                   "type":"string"
                },
-               "networkID":{
-                  "title":"Networkid",
-                  "type":"integer"
+               "resource_id":{
+                  "title":"Resource Id",
+                  "type":"string"
                },
-               "timestampStart":{
-                  "title":"Timestampstart",
+               "network_id":{
+                  "title":"Network Id",
+                  "type":"string"
+               },
+               "parent_id":{
+                  "title":"Parent Id",
+                  "type":"string"
+               },
+               "timestamp_start":{
+                  "title":"Timestamp Start",
                   "type":"string",
                   "format":"date-time"
                },
-               "timestampEnd":{
-                  "title":"Timestampend",
+               "timestamp_end":{
+                  "title":"Timestamp End",
                   "type":"string",
                   "format":"date-time"
                },
@@ -671,16 +714,12 @@
                   "title":"Status",
                   "type":"integer"
                },
-               "tenantID":{
-                  "title":"Tenantid",
+               "tenant_id":{
+                  "title":"Tenant Id",
                   "type":"string"
                },
-               "resourceID":{
-                  "title":"Resourceid",
-                  "type":"string"
-               },
-               "referenceID":{
-                  "title":"Referenceid",
+               "reference_id":{
+                  "title":"Reference Id",
                   "type":"string"
                }
             }
@@ -706,27 +745,27 @@
          "Response_Metric_Model":{
             "title":"Response_Metric_Model",
             "required":[
-               "metricName",
-               "metricType",
+               "metric_name",
+               "metric_type",
                "step",
                "next_run_at"
             ],
             "type":"object",
             "properties":{
-               "metricName":{
-                  "title":"Metricname",
+               "metric_name":{
+                  "title":"Metric Name",
                   "type":"string"
                },
-               "metricType":{
-                  "title":"Metrictype",
+               "metric_type":{
+                  "title":"Metric Type",
                   "type":"string"
                },
                "step":{
                   "title":"Step",
                   "type":"string"
                },
-               "aggregationMethod":{
-                  "title":"Aggregationmethod",
+               "aggregation_method":{
+                  "title":"Aggregation Method",
                   "type":"string"
                },
                "step_aggregation":{
@@ -749,8 +788,8 @@
             "title":"Update_Config_Model",
             "type":"object",
             "properties":{
-               "timestampEnd":{
-                  "title":"Timestampend",
+               "timestamp_end":{
+                  "title":"Timestamp End",
                   "type":"string",
                   "format":"date-time"
                },
