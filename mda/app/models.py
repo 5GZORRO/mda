@@ -22,7 +22,9 @@ class Response_Metric_Model(BaseModel):
   next_aggregation: Optional[datetime.datetime] = None
 
 class Config_Model(BaseModel):
-  business_id: str
+  transaction_id: str
+  instance_id: str
+  product_id: str
   topic: str
   monitoring_endpoint: str
   data_source_type: str
@@ -41,7 +43,9 @@ class Response_Config_Model(BaseModel):
   id: uuid.UUID
   created_at: datetime.datetime
   updated_at: datetime.datetime
-  business_id: str
+  transaction_id: str
+  instance_id: str
+  product_id: str
   monitoring_endpoint: str
   topic: str
   resource_id: str

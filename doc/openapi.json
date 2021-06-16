@@ -26,7 +26,9 @@
                               "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                               "created_at":"2021-03-11T11:34:00.402075",
                               "updated_at":"null",
-                              "businessID":"business1",
+                              "transactionID":"business1",
+                              "instance_id": "instance1",
+                              "product_id": "product1",
                               "topic":"test1",
                               "networkID":1,
                               "tenantID":"tenant1",
@@ -92,7 +94,9 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":"business1",
+                           "transactionID":"business1",
+                           "instance_id": "instance1",
+                           "product_id": "product1",
                            "topic":"test1",
                            "networkID":1,
                            "tenantID":"tenant1",
@@ -169,7 +173,9 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":"business1",
+                           "transactionID":"business1",
+                           "instance_id": "instance1",
+                           "product_id": "product1",
                            "topic":"test1",
                            "networkID":1,
                            "tenantID":"tenant1",
@@ -254,7 +260,9 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":"business1",
+                           "transactionID":"business1",
+                           "instance_id": "instance1",
+                           "product_id": "product1",
                            "topic":"test1",
                            "networkID":1,
                            "tenantID":"tenant1",
@@ -374,7 +382,9 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":"business1",
+                           "transactionID":"business1",
+                           "instance_id": "instance1",
+                           "product_id": "product1",
                            "topic":"test1",
                            "networkID":1,
                            "tenantID":"tenant1",
@@ -451,7 +461,9 @@
                            "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
                            "created_at":"2021-03-11T11:34:00.402075",
                            "updated_at":"null",
-                           "businessID":"business1",
+                           "transactionID":"business1",
+                           "instance_id": "instance1",
+                           "product_id": "product1",
                            "topic":"test1",
                            "networkID":1,
                            "tenantID":"tenant1",
@@ -508,7 +520,9 @@
          "Config_Model":{
             "title":"Config_Model",
             "required":[
-               "business_id",
+               "transaction_id",
+               "instance_id",
+               "product_id",
                "topic",
                "monitoring_endpoint",
                "data_source_type",
@@ -519,9 +533,17 @@
             ],
             "type":"object",
             "properties":{
-               "business_id":{
+               "transaction_id":{
                   "title":"Business Id",
                   "type":"string"
+               },
+               "instance_id":{
+                  "title": "instance Id",
+                  "type": "string"
+               },
+               "product_id":{
+                  "title": "product Id",
+                  "type": "string"
                },
                "topic":{
                   "title":"Topic",
@@ -640,7 +662,9 @@
                "id",
                "created_at",
                "updated_at",
-               "business_id",
+               "transaction_id",
+               "instance_id",
+               "product_id",
                "monitoring_endpoint",
                "topic",
                "resource_id",
@@ -669,9 +693,17 @@
                   "type":"string",
                   "format":"date-time"
                },
-               "business_id":{
+               "transaction_id":{
                   "title":"Business Id",
                   "type":"string"
+               },
+               "instance_id":{
+                  "title": "instance Id",
+                  "type": "string"
+               },
+               "product_id":{
+                  "title": "product Id",
+                  "type": "string"
                },
                "monitoring_endpoint":{
                   "title":"Monitoring Endpoint",

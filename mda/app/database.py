@@ -13,7 +13,9 @@ class Config(Base):
   _id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
   created_at = Column(DateTime, default=datetime.datetime.now)
   updated_at = Column(DateTime, nullable=True)
-  business_id = Column(String(256), nullable=False)
+  transaction_id  = Column(String(256), nullable=False)
+  instance_id  = Column(String(256), nullable=True)
+  product_id  = Column(String(256), nullable=True)
   kafka_topic = Column(String(256), nullable=False)
   monitoring_endpoint = Column(String(256), nullable=False)
   network_id = Column(String(256), nullable=True)
@@ -26,8 +28,10 @@ class Config(Base):
   status = Column(Integer, default=1)
   metrics = relationship("Metric")
 
-  def __init__(self, business_id, kafka_topic, network_id, timestamp_start, timestamp_end, tenant_id, resource_id, reference_id, parent_id, monitoring_endpoint):
-    self.business_id = business_id
+  def __init__(self, transaction_id, kafka_topic, network_id, timestamp_start, timestamp_end, tenant_id, resource_id, reference_id, parent_id, monitoring_endpoint, instance_id, product_id):
+    self.transaction_id  = transaction_id
+    self.instance_id = instance_id
+    self.product_id = product_id
     self.kafka_topic = kafka_topic
     self.network_id = network_id
     self.timestamp_start = timestamp_start
@@ -42,7 +46,9 @@ class Config(Base):
     return ({'id': self._id,
              'created_at': self.created_at,
              'updated_at': self.updated_at,
-             'business_id': self.business_id,
+             'transaction_id': self.transaction_id,
+             'instance_id': self.instance_id,
+             'product_id': self.product_id,
              'topic': self.kafka_topic,
              'monitoring_endpoint': self.monitoring_endpoint,
              'network_id': self.network_id,
@@ -110,7 +116,7 @@ def add_config(config: Config_Model, orchestrator, aggregator):
 
   try:
     config.monitoring_endpoint = config.monitoring_endpoint + mapping_data_source_query[config.data_source_type] 
-    row = Config(config.business_id, config.topic, config.context_ids[0].network_slice_id, config.timestamp_start, config.timestamp_end, config.tenant_id, config.context_ids[0].resource_id, config.reference_id, config.context_ids[0].parent_id, config.monitoring_endpoint)
+    row = Config(config.transaction_id, config.topic, config.context_ids[0].network_slice_id, config.timestamp_start, config.timestamp_end, config.tenant_id, config.context_ids[0].resource_id, config.reference_id, config.context_ids[0].parent_id, config.monitoring_endpoint, config.instance_id, config.product_id)
     db_session.add(row)
     db_session.commit()
     response = row.toString()
@@ -124,9 +130,9 @@ def add_config(config: Config_Model, orchestrator, aggregator):
       db_session.commit()
       
       # Add to queue
-      orchestrator.wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, row.monitoring_endpoint))
+      orchestrator.wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.transaction_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, row.monitoring_endpoint, config.instance_id, config.product_id))
       if row_m.aggregation_method != None:
-        aggregator.wait_queue_agg.put((row_m.next_aggregation, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation))
+        aggregator.wait_queue_agg.put((row_m.next_aggregation, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.transaction_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, config.instance_id, config.product_id))
       
       response['metrics'].append(row_m.toString())
     return response
@@ -225,9 +231,9 @@ def update_config(config_id, config, orchestrator, aggregator):
         db_session.add(row_m)
         db_session.commit()
         # Add to queue
-        orchestrator.wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, row.monitoring_endpoint))
+        orchestrator.wait_queue.put((row_m.next_run_at, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.transaction_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, row.monitoring_endpoint, config.instance_id, config.product_id))
         if row_m.aggregation_method != None:
-          aggregator.wait_queue_agg.put((row_m.next_aggregation, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.business_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation))
+          aggregator.wait_queue_agg.put((row_m.next_aggregation, row.timestamp_start, row_m.step, row.timestamp_end, row_m._id, row_m.metric_name, row_m.metric_type, row_m.aggregation_method, row.transaction_id, row.kafka_topic, row.network_id, row.tenant_id, row.resource_id, row.reference_id, row_m.step_aggregation, row_m.next_aggregation, config.instance_id, config.product_id))
         response['metrics'].append(row_m.toString())
       return response
     return get_config(config_id)
@@ -287,11 +293,11 @@ def enable_config(config_id, orchestrator, aggregator):
     for metric in metrics:
       metric.status = 1
       metric.next_run_at = now
-      orchestrator.wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation, config.monitoring_endpoint))
+      orchestrator.wait_queue.put((metric.next_run_at, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.transaction_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation, config.monitoring_endpoint, config.instance_id, config.product_id))
       if metric.aggregation_method != None:
         sec_to_add = convert_to_seconds(metric.step_aggregation)
         metric.next_aggregation = now + relativedelta(seconds=sec_to_add)
-        aggregator.wait_queue_agg.put((metric.next_aggregation, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.business_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation))
+        aggregator.wait_queue_agg.put((metric.next_aggregation, config.timestamp_start, metric.step, config.timestamp_end, metric._id, metric.metric_name, metric.metric_type, metric.aggregation_method, config.transaction_id, config.kafka_topic, config.network_id, config.tenant_id, config.resource_id, config.reference_id, metric.step_aggregation, metric.next_aggregation, config.instance_id, config.product_id))
       add_metrics['metrics'].append(metric.toString())
       db_session.commit()
     return add_metrics
@@ -357,15 +363,15 @@ def load_database_metrics(orchestrator, aggregator):
                        "WHERE c.status = 1 AND next_run_at < '"+str(now)+"';");
     db_session.commit()
     # Get metrics
-    result = db_session.execute("SELECT next_run_at, metric_name, metric_type, aggregation_method, step, business_id, kafka_topic, network_id, " \
+    result = db_session.execute("SELECT next_run_at, metric_name, metric_type, aggregation_method, step, transaction_id, instance_id, product_id, kafka_topic, network_id, " \
                                        "tenant_id, resource_id, reference_id, timestamp_start, timestamp_end, metric._id, step_aggregation, " \
                                        "next_aggregation, monitoring_endpoint " \
                                 "FROM metric join config on metric.config_id = config._id " \
                                 "WHERE metric.status = 1;")
     for row in result:
-      orchestrator.wait_queue.put((row['next_run_at'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['business_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation'], row['monitoring_endpoint']))
+      orchestrator.wait_queue.put((row['next_run_at'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['transaction_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation'], row['monitoring_endpoint'], row['instance_id'], row['product_id']))
       if row['aggregation_method'] != None:
-        aggregator.wait_queue_agg.put((row['next_aggregation'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['business_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation']))
+        aggregator.wait_queue_agg.put((row['next_aggregation'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['transaction_id'], row['kafka_topic'], row['network_id'], row['tenant_id'], row['resource_id'], row['reference_id'], row['step_aggregation'], row['next_aggregation'], row['instance_id'], row['product_id']))
     return 1
   except Exception as e:
     print(e)

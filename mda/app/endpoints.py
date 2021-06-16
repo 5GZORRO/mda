@@ -15,8 +15,8 @@ async def set_param(config: Config_Model):
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Step and step aggregation options is "+str(step_options)+"."})
   if config.timestamp_start == None:
     config.timestamp_start = datetime.datetime.now()
-  elif config.timestamp_start < datetime.datetime.now() - relativedelta(minutes=1):
-    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after current now."})
+  # elif config.timestamp_start < datetime.datetime.now() - relativedelta(minutes=1):
+  #   return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after current now."})
   if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
   

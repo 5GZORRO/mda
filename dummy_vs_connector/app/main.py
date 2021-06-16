@@ -13,7 +13,7 @@ def converter(o):
 @app.get("/enableConfig")
 async def send_config_mda():
 	config = {
-		"businessID": randint(100,999),
+		"transactionID": randint(100,999),
 		"topic": "postData",
 		"networkID": randint(100,999),
 		"metrics": [

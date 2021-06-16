@@ -19,7 +19,7 @@ class Orchestrator():
 
         return aux[0]
 
-    def request_orchestrator(self, metric_name, resourceID, referenceID, next_run_at, tenantID, businessID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint):
+    def request_orchestrator(self, metric_name, resourceID, referenceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, ProductID):
         
         try:
             #request_metric = "match="+metric_name+"&"
@@ -48,6 +48,8 @@ class Orchestrator():
                         "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
                         "metricValue" : json_data["data"]["result"][0]["values"][0][1],
                         "resourceID" : resourceID,
+                        "instanceID": instanceID,
+                        "ProductID": ProductID,
                         "referenceID" : referenceID,
                         "timestamp" : str(next_run_at)
                     }
@@ -58,7 +60,7 @@ class Orchestrator():
                     
                     data = {
                         "operatorID" : tenantID,
-                        "businessID" : businessID,
+                        "transactionID" : transactionID,
                         "networkID" : networkID
                     }
                     data["monitoringData"] = monitoringData

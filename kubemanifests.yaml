@@ -168,12 +168,12 @@ items:
               resources: {}
               volumeMounts:
                 - mountPath: /var/lib/postgresql/data
-                  name: postgres-claim0
+                  name: mda-postgres-claim0
           restartPolicy: Always
           volumes:
-            - name: postgres-claim0
+            - name: mda-postgres-claim0
               persistentVolumeClaim:
-                claimName: postgres-claim0
+                claimName: mda-postgres-claim0
     status: {}
   - apiVersion: apps/v1
     kind: Deployment
@@ -201,6 +201,11 @@ items:
             io.kompose.service: osm
         spec:
           containers:
+            - env:
+                - name: MIN_AVAILABILITY
+                  value: "0.90"
+                - name: MAX_AVAILABILITY
+                  value: "0.99"
             - image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
               name: osm
               ports:
@@ -216,8 +221,8 @@ items:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: postgres-claim0
-      name: postgres-claim0
+        io.kompose.service: mda-postgres-claim0
+      name: mda-postgres-claim0
     spec:
       storageClassName: postgresvolume
       accessModes:
@@ -248,7 +253,7 @@ items:
   - apiVersion: v1
     kind: PersistentVolume
     metadata:
-      name: postgres-pv-volume
+      name: mda-postgres-pv-volume
       labels:
         type: local
     spec:

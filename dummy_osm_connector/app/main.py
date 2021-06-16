@@ -1,12 +1,19 @@
 from typing import List
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import random, requests
+import random, requests, os
 
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
+
+MIN_AVAILABILITY = os.environ["MIN_AVAILABILITY"]
+MAX_AVAILABILITY = os.environ["MAX_AVAILABILITY"]
+
+initial_value = 0.95
+time_now = datetime.now()
+next_time_change = time_now + timedelta(hours = 1)
 
 app = FastAPI()
 
@@ -41,6 +48,46 @@ def generate_response():
     else:
         st = 1
     return request_types[st]
+
+def generate_availability():
+
+    global time_now
+    global next_time_change
+    global initial_value
+    
+    if next_time_change < datetime.now():
+
+        if initial_value == 0.99:
+            initial_value == 0.89
+
+        elif initial_value == 0.90:
+            initial_value = 0.91
+
+        else:
+            random_value = round(random.uniform(float(MIN_AVAILABILITY), float(MAX_AVAILABILITY)), 2)
+
+            if random_value > 0.95:
+                initial_value = initial_value + 0.01
+
+            else:
+                initial_value = initial_value - 0.01
+
+        next_time_change = next_time_change + timedelta(hours = 1)
+
+        return initial_value
+    
+    else:
+        return initial_value
+
+    '''
+    total_availability = 20
+    options = [round(random.uniform(float(MIN_AVAILABILITY), float(MAX_AVAILABILITY)), 2)]
+        
+    for num in range(total_availability):
+        options.append(1)
+
+    return float(random.choice(options))
+    '''
 
 # ----------------------------------------------------------------#
 
@@ -90,7 +137,18 @@ async def monitoring_data(start: datetime, match: List[str] = Query([], min_leng
             "values": []
         }
         for date in dates:
-            json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
+            if metric == "cpu_utilization":
+                json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
+            
+            elif metric == "availability":
+                json_metric['values'].append([datetime.timestamp(date), round(generate_availability(), 2)])
+
+            elif metric == "error":
+                json_metric['values'].append([datetime.timestamp(date), round(1 - generate_availability(), 2)])
+
+            else:
+                json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
+
         response['data']['result'].append(json_metric)
 
     return response
