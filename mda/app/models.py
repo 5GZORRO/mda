@@ -29,7 +29,6 @@ class Config_Model(BaseModel):
   monitoring_endpoint: str
   data_source_type: str
   tenant_id: str
-  reference_id: str
   context_ids: List[Context_Model]
   metrics: List[Metric_Model]
   timestamp_start: Optional[datetime.datetime] = None
@@ -56,7 +55,6 @@ class Response_Config_Model(BaseModel):
   metrics: List[Response_Metric_Model]
   status: int
   tenant_id: str
-  reference_id: str
 
 class Response_Error_Model(BaseModel):
 	status: str

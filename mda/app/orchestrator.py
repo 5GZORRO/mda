@@ -19,7 +19,7 @@ class Orchestrator():
 
         return aux[0]
 
-    def request_orchestrator(self, metric_name, resourceID, referenceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, ProductID):
+    def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, ProductID):
         
         try:
             #request_metric = "match="+metric_name+"&"
@@ -50,7 +50,6 @@ class Orchestrator():
                         "resourceID" : resourceID,
                         "instanceID": instanceID,
                         "ProductID": ProductID,
-                        "referenceID" : referenceID,
                         "timestamp" : str(next_run_at)
                     }
                     

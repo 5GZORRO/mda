@@ -19,7 +19,7 @@ class Aggregator():
 
         return aux[0]
 
-    def send_aggregation(self, metric_name, resourceID, referenceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, next_aggregation, step_aggregation, instanceID, ProductID):
+    def send_aggregation(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, next_aggregation, step_aggregation, instanceID, ProductID):
         try:
             value = get_last_aggregation(metric_id, aggregation, next_aggregation, step_aggregation)
             # Create JSON object that will be sent to DL Kafka Topic
@@ -27,7 +27,6 @@ class Aggregator():
                 "metricName" : metric_name,
                 "metricValue" : value,
                 "resourceID" : resourceID,
-                "referenceID" : referenceID,
                 "timestamp" : str(next_run_at),
                 "aggregationMethod": aggregation
             }

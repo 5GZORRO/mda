@@ -48,7 +48,7 @@ except Exception as e:
   sys.exit(0)
 
 # Json response example
-json_response_enable = {"id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b","created_at": "2021-03-11T11:34:00.402075","updated_at": "null","transactionID": 36574564,"transactionID": "business1", "topic": "test1", "networkID": 1, "tenantID": "tenant1", "referenceID": "reference1", "resourceID": "resource1","timestampStart": "2021-03-11T11:35:00","timestampEnd": "null","metrics": [{"metricName": "cpu_utilization","metricType": "float","aggregationMethod": "sum","step": "15min","step_aggregation": "1h", "next_run_at": "2021-03-11T11:45:00", "next_aggregation": "2021-03-11T12:35:00"}],"status": 1}
+json_response_enable = {"id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b","created_at": "2021-03-11T11:34:00.402075","updated_at": "null","transactionID": 36574564,"transactionID": "business1", "topic": "test1", "networkID": 1, "tenantID": "tenant1", "resourceID": "resource1","timestampStart": "2021-03-11T11:35:00","timestampEnd": "null","metrics": [{"metricName": "cpu_utilization","metricType": "float","aggregationMethod": "sum","step": "15min","step_aggregation": "1h", "next_run_at": "2021-03-11T11:45:00", "next_aggregation": "2021-03-11T12:35:00"}],"status": 1}
 json_response_disable = json_response_enable.copy()
 json_response_disable['status'] = 0
 
