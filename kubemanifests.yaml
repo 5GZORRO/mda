@@ -206,7 +206,7 @@ items:
                   value: "0.90"
                 - name: MAX_AVAILABILITY
                   value: "0.99"
-            - image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
+              image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
               name: osm
               ports:
                 - containerPort: 4500
