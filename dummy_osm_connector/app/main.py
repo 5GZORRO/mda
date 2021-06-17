@@ -57,11 +57,11 @@ def generate_availability():
     
     if next_time_change < datetime.now():
 
-        if initial_value == 0.99:
-            initial_value == 0.89
+        if initial_value >= 0.99:
+            initial_value = 0.98
 
-        elif initial_value == 0.90:
-            initial_value = 0.91
+        elif initial_value <= 0.91:
+            initial_value = 0.92
 
         else:
             random_value = round(random.uniform(float(MIN_AVAILABILITY), float(MAX_AVAILABILITY)), 2)
