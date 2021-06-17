@@ -152,7 +152,7 @@ def check_waiting_aggregations():
       del aggregator.aggregation_queue.queue[aggregator.aggregation_queue.queue.index(metric)]
     aggregator.aggregation_queue.put(tuple(metric))
     # Add next to wait queue
-    sec_to_add = convert_to_seconds(metric[14])
+    sec_to_add = convert_to_seconds(metric[13])
     metric[0] = metric[0] + relativedelta(seconds=sec_to_add)
     aggregator.wait_queue_agg.put(tuple(metric))
 
