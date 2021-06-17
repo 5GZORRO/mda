@@ -123,7 +123,7 @@ async def disable_config_id(config_id):
   # Disable config by id
   if validate_uuid4(config_id) is False:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Config id invalid."})
-  resp = disable_config(config_id)
+  resp = disable_config(config_id, orchestrator, aggregator)
   if resp == 0:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Config id invalid."})
   if resp == 1:
@@ -143,7 +143,7 @@ async def delete_config_id(config_id):
   # Get config by id
   if validate_uuid4(config_id) is False:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Config id invalid."})
-  resp = delete_config(config_id)
+  resp = delete_config(config_id, orchestrator, aggregator)
   if resp == 0:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Config id invalid."})
   if resp == -1:

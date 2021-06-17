@@ -302,7 +302,7 @@ def enable_config(config_id, orchestrator, aggregator):
     print(e)
     return -1
 
-def disable_config(config_id):
+def disable_config(config_id, orchestrator, aggregator):
 
   try:
     config = Config.query.filter_by(_id=config_id).first()
@@ -324,7 +324,7 @@ def disable_config(config_id):
     print(e)
     return -1
 
-def delete_config(config_id):
+def delete_config(config_id, orchestrator, aggregator):
 
   try:
     config = Config.query.filter_by(_id=config_id).first()
