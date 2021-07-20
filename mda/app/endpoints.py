@@ -1,11 +1,6 @@
 from .main import *
 
-@app.post("/settings", status_code=201, responses={201: {"model": Response_Config_Model,
-														 "content": {"application/json": {
-																	 "example": json_response_enable}}},
-												   404: {"model": Response_Error_Model,
-														 "content": {"application/json": {
-																	 "example": {"status": "Error", "message": "Error message."}}}}})
+@app.post("/settings", status_code=201, responses={201: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def set_param(config: Config_Model):
 
   for metric in config.metrics:
@@ -34,12 +29,7 @@ async def set_param(config: Config_Model):
   info_log(200, f'Monitoring spec successfully created by operator {config.tenant_id}')
   return resp
 
-@app.get("/settings/{config_id}", responses={200: {"model": Response_Config_Model,
-												   "content": {"application/json": {
-															   "example": json_response_enable}}},
-											 404: {"model": Response_Error_Model,
-												   "content": {"application/json": {
-															   "example": {"status": "Error", "message": "Error message."}}}}})
+@app.get("/settings/{config_id}", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def get_config_id(config_id):
   # Get config by id
   if validate_uuid4(config_id) is False:
@@ -51,12 +41,7 @@ async def get_config_id(config_id):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in get config in database."})
   return resp
 
-@app.get("/settings", responses={200: {"model": List[Response_Config_Model],
-									   "content": {"application/json": {
-												   "example": [json_response_enable]}}},
-								 404: {"model": Response_Error_Model,
-									   "content": {"application/json": {
-												   "example": {"status": "Error", "message": "Error message."}}}}})
+@app.get("/settings", responses={200: {"model": List[Response_Config_Model], "content": {"application/json": { "example": [json_response_enable]}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def get_all_configs():
   # Get configs
   resp = get_configs()
@@ -89,12 +74,7 @@ async def update_config_id(config_id, config: Update_Config_Model):
   info_log(200, f'Monitoring spec {config_id} successfully updated')
   return resp
 
-@app.put("/settings/{config_id}/enable", responses={200: {"model": Response_Config_Model,
-														  "content": {"application/json": {
-																	  "example": json_response_enable}}},
-													404: {"model": Response_Error_Model,
-														  "content": {"application/json": {
-																	  "example": {"status": "Error", "message": "Error message."}}}}})
+@app.put("/settings/{config_id}/enable", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def enable_config_id(config_id):
 
   # Enable config by id
@@ -112,12 +92,7 @@ async def enable_config_id(config_id):
   info_log(200, f'Monitoring spec {config_id} successfully enabled')
   return resp
 
-@app.put("/settings/{config_id}/disable", responses={200: {"model": Response_Config_Model,
-														                               "content": {"application/json": {
-                                                           "example": json_response_disable}}},
-													 404: {"model": Response_Error_Model,
-														   "content": {"application/json": {
-																	   "example": {"status": "Error", "message": "Error message."}}}}})
+@app.put("/settings/{config_id}/disable", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_disable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def disable_config_id(config_id):
 
   # Disable config by id
@@ -135,9 +110,7 @@ async def disable_config_id(config_id):
   info_log(200, f'Monitoring spec {config_id} successfully disabled')
   return resp
 
-@app.delete("/settings/{config_id}", status_code=HTTP_204_NO_CONTENT, responses={404: {"model": Response_Error_Model,
-													  "content": {"application/json": {
-																  "example": {"status": "Error", "message": "Error message."}}}}})
+@app.delete("/settings/{config_id}", status_code=HTTP_204_NO_CONTENT, responses={404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def delete_config_id(config_id):
 
   # Get config by id
