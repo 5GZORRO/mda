@@ -48,7 +48,7 @@ except Exception as e:
   sys.exit(0)
 
 # Json response example
-json_response_enable = {"id": "ed7683f1-b625-4b41-a32d-3e690c4c6740", "created_at": "2021-07-20T11:04:34.033627", "updated_at": "null", "transaction_id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b", "instance_id": "21", "product_id": "10", "topic": "operator-a-in-0", "monitoring_endpoint": "http://osm:4500/monitoringData?match=metric_name&start=start_time", "timestamp_start": "2021-07-20T11:04:34.030387", "timestamp_end": null, "metrics": [{"metric_name": "availability", "metric_type": "availability", "aggregation_method": "AVG", "step": "1m", "step_aggregation": "2m", "next_run_at": "2021-07-20T11:04:34.030387", "next_aggregation": "2021-07-20T11:06:34.030387"}], "status": 1, "tenant_id": "operator-a", "parent_id": "null", "context_ids": [{"resource_id": "10", "network_slice_id": "22"}]}
+json_response_enable = {"id": "ed7683f1-b625-4b41-a32d-3e690c4c6740", "created_at": "2021-07-20T11:04:34.033627", "updated_at": "null", "transaction_id": "ab51f3e1-7b61-4f9d-85a4-9e9f366b593b", "instance_id": "21", "product_id": "10", "topic": "operator-a-in-0", "monitoring_endpoint": "http://osm:4500/monitoringData?match=metric_name&start=start_time", "timestamp_start": "2021-07-20T11:04:34.030387", "timestamp_end": null, "metrics": [{"metric_name": "availability", "metric_type": "availability", "aggregation_method": "AVG", "step": "1m", "step_aggregation": "2m", "next_run_at": "2021-07-20T11:04:34.030387", "next_aggregation": "2021-07-20T11:06:34.030387"}], "status": 1, "tenant_id": "operator-a", "context_ids": [{"resource_id": "10", "network_slice_id": "22", "parent_id": "10"}]}
 json_response_disable = json_response_enable.copy()
 json_response_disable['status'] = 0
 

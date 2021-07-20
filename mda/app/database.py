@@ -54,11 +54,11 @@ class Config(Base):
              'metrics': [],
              'status': self.status,
              'tenant_id' : self.tenant_id,
-             'parent_id' : self.parent_id,
              'context_ids': [
                {
                  'resource_id': self.resource_id,
-                 'network_slice_id': self.network_slice_id
+                 'network_slice_id': self.network_slice_id,
+                 'parent_id' : self.parent_id
                }
              ]})
 
