@@ -31,6 +31,7 @@ items:
         io.kompose.service: postgres
       name: postgres
     spec:
+      type: NodePort
       ports:
         - name: "5432"
           port: 5432
@@ -88,7 +89,7 @@ items:
           containers:
             - env:
                 - name: KAFKA_HOST
-                  value: "172.28.3.196"
+                  value: "172.31.8.183"
                 - name: KAFKA_PORT
                   value: "9092"
                 - name: POSTGRES_DB
@@ -167,7 +168,7 @@ items:
                 - containerPort: 5432
               resources: {}
               volumeMounts:
-                - mountPath: /var/lib/postgresql/data
+                - mountPath: /mnt/postgres
                   name: mda-postgres-claim0
           restartPolicy: Always
           volumes:
