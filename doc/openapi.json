@@ -1,849 +1,847 @@
 {
-   "openapi":"3.0.2",
-   "info":{
-      "title":"FastAPI",
-      "version":"0.1.0"
-   },
-   "paths":{
-      "/settings":{
-         "get":{
-            "summary":"Get All Configs",
-            "operationId":"get_all_configs_settings_get",
-            "responses":{
-               "200":{
-                  "description":"Successful Response",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "title":"Response 200 Get All Configs Settings Get",
-                           "type":"array",
-                           "items":{
-                              "$ref":"#/components/schemas/Response_Config_Model"
-                           }
-                        },
-                        "example":[
-                           {
-                              "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
-                              "created_at":"2021-03-11T11:34:00.402075",
-                              "updated_at":"null",
-                              "transactionID":"business1",
-                              "instance_id": "instance1",
-                              "product_id": "product1",
-                              "topic":"test1",
-                              "networkID":1,
-                              "tenantID":"tenant1",
-                              "resourceID":"resource1",
-                              "timestampStart":"2021-03-11T11:35:00",
-                              "timestampEnd":"null",
-                              "metrics":[
-                                 {
-                                    "metricName":"cpu_utilization",
-                                    "metricType":"float",
-                                    "aggregationMethod":"sum",
-                                    "step":"15min",
-                                    "step_aggregation":"1h",
-                                    "next_run_at":"2021-03-11T11:45:00",
-                                    "next_aggregation":"2021-03-11T12:35:00"
-                                 }
-                              ],
-                              "status":1
-                           }
-                        ]
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
-                        },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+    "openapi":"3.0.2",
+    "info":{
+        "title":"FastAPI",
+        "version":"0.1.0"
+    },
+    "paths":{
+        "/settings":{
+            "get":{
+                "summary":"Get All Configs",
+                "operationId":"get_all_configs_settings_get",
+                "responses":{
+                    "200":{
+                        "description":"Successful Response",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "title":"Response 200 Get All Configs Settings Get",
+                                    "type":"array",
+                                    "items":{
+                                        "$ref":"#/components/schemas/Response_Config_Model"
+                                    }
+                                },
+                                "example":[
+                                    {
+                                        "id":"ed7683f1-b625-4b41-a32d-3e690c4c6740",
+                                        "created_at":"2021-07-20T11:04:34.033627",
+                                        "updated_at":"null",
+                                        "transaction_id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                                        "instance_id":"21",
+                                        "product_id":"10",
+                                        "topic":"operator-a-in-0",
+                                        "monitoring_endpoint":"http://osm:4500/monitoringData?match=metric_name&start=start_time",
+                                        "timestamp_start":"2021-07-20T11:04:34.030387",
+                                        "timestamp_end":{
+                                            
+                                        },
+                                        "metrics":[
+                                            {
+                                                "metric_name":"availability",
+                                                "metric_type":"availability",
+                                                "aggregation_method":"AVG",
+                                                "step":"1m",
+                                                "step_aggregation":"2m",
+                                                "next_run_at":"2021-07-20T11:04:34.030387",
+                                                "next_aggregation":"2021-07-20T11:06:34.030387"
+                                            }
+                                        ],
+                                        "status":1,
+                                        "tenant_id":"operator-a",
+                                        "context_ids":[
+                                            {
+                                                "resource_id":"10",
+                                                "network_slice_id":"22",
+                                                "parent_id":"10"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
                         }
-                     }
-                  }
-               }
-            }
-         },
-         "post":{
-            "summary":"Set Param",
-            "operationId":"set_param_settings_post",
-            "requestBody":{
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/Config_Model"
-                     }
-                  }
-               },
-               "required":true
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
+                        }
+                    }
+                }
             },
-            "responses":{
-               "201":{
-                  "description":"Successful Response",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Config_Model"
-                        },
-                        "example":{
-                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
-                           "created_at":"2021-03-11T11:34:00.402075",
-                           "updated_at":"null",
-                           "transactionID":"business1",
-                           "instance_id": "instance1",
-                           "product_id": "product1",
-                           "topic":"test1",
-                           "networkID":1,
-                           "tenantID":"tenant1",
-                           "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:35:00",
-                           "timestampEnd":"null",
-                           "metrics":[
-                              {
-                                 "metricName":"cpu_utilization",
-                                 "metricType":"float",
-                                 "aggregationMethod":"sum",
-                                 "step":"15min",
-                                 "step_aggregation":"1h",
-                                 "next_run_at":"2021-03-11T11:45:00",
-                                 "next_aggregation":"2021-03-11T12:35:00"
-                              }
-                           ],
-                           "status":1
+            "post":{
+                "summary":"Set Param",
+                "operationId":"set_param_settings_post",
+                "requestBody":{
+                    "content":{
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/Config_Model"
+                            }
                         }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
-                        },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+                    },
+                    "required":true
+                },
+                "responses":{
+                    "201":{
+                        "description":"Successful Response",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Config_Model"
+                                },
+                                "example":{
+                                    "id":"ed7683f1-b625-4b41-a32d-3e690c4c6740",
+                                    "created_at":"2021-07-20T11:04:34.033627",
+                                    "updated_at":"null",
+                                    "transaction_id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                                    "instance_id":"21",
+                                    "product_id":"10",
+                                    "topic":"operator-a-in-0",
+                                    "monitoring_endpoint":"http://osm:4500/monitoringData?match=metric_name&start=start_time",
+                                    "timestamp_start":"2021-07-20T11:04:34.030387",
+                                    "timestamp_end":{
+                                        
+                                    },
+                                    "metrics":[
+                                        {
+                                            "metric_name":"availability",
+                                            "metric_type":"availability",
+                                            "aggregation_method":"AVG",
+                                            "step":"1m",
+                                            "step_aggregation":"2m",
+                                            "next_run_at":"2021-07-20T11:04:34.030387",
+                                            "next_aggregation":"2021-07-20T11:06:34.030387"
+                                        }
+                                    ],
+                                    "status":1,
+                                    "tenant_id":"operator-a",
+                                    "context_ids":[
+                                        {
+                                            "resource_id":"10",
+                                            "network_slice_id":"22",
+                                            "parent_id":"10"
+                                        }
+                                    ]
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "422":{
-                  "description":"Validation Error",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/HTTPValidationError"
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
                         }
-                     }
-                  }
-               }
+                    },
+                    "422":{
+                        "description":"Validation Error",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
             }
-         }
-      },
-      "/settings/{config_id}":{
-         "get":{
-            "summary":"Get Config Id",
-            "operationId":"get_config_id_settings__config_id__get",
-            "parameters":[
-               {
-                  "required":true,
-                  "schema":{
-                     "title":"Config Id"
-                  },
-                  "name":"config_id",
-                  "in":"path"
-               }
-            ],
-            "responses":{
-               "200":{
-                  "description":"Successful Response",
-                  "content":{
-                     "application/json":{
+        },
+        "/settings/{config_id}":{
+            "get":{
+                "summary":"Get Config Id",
+                "operationId":"get_config_id_settings__config_id__get",
+                "parameters":[
+                    {
+                        "required":true,
                         "schema":{
-                           "$ref":"#/components/schemas/Response_Config_Model"
+                            "title":"Config Id"
                         },
-                        "example":{
-                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
-                           "created_at":"2021-03-11T11:34:00.402075",
-                           "updated_at":"null",
-                           "transactionID":"business1",
-                           "instance_id": "instance1",
-                           "product_id": "product1",
-                           "topic":"test1",
-                           "networkID":1,
-                           "tenantID":"tenant1",
-                           "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:35:00",
-                           "timestampEnd":"null",
-                           "metrics":[
-                              {
-                                 "metricName":"cpu_utilization",
-                                 "metricType":"float",
-                                 "aggregationMethod":"sum",
-                                 "step":"15min",
-                                 "step_aggregation":"1h",
-                                 "next_run_at":"2021-03-11T11:45:00",
-                                 "next_aggregation":"2021-03-11T12:35:00"
-                              }
-                           ],
-                           "status":1
+                        "name":"config_id",
+                        "in":"path"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Successful Response",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Config_Model"
+                                },
+                                "example":{
+                                    "id":"ed7683f1-b625-4b41-a32d-3e690c4c6740",
+                                    "created_at":"2021-07-20T11:04:34.033627",
+                                    "updated_at":"null",
+                                    "transaction_id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                                    "instance_id":"21",
+                                    "product_id":"10",
+                                    "topic":"operator-a-in-0",
+                                    "monitoring_endpoint":"http://osm:4500/monitoringData?match=metric_name&start=start_time",
+                                    "timestamp_start":"2021-07-20T11:04:34.030387",
+                                    "timestamp_end":{
+                                        
+                                    },
+                                    "metrics":[
+                                        {
+                                            "metric_name":"availability",
+                                            "metric_type":"availability",
+                                            "aggregation_method":"AVG",
+                                            "step":"1m",
+                                            "step_aggregation":"2m",
+                                            "next_run_at":"2021-07-20T11:04:34.030387",
+                                            "next_aggregation":"2021-07-20T11:06:34.030387"
+                                        }
+                                    ],
+                                    "status":1,
+                                    "tenant_id":"operator-a",
+                                    "context_ids":[
+                                        {
+                                            "resource_id":"10",
+                                            "network_slice_id":"22",
+                                            "parent_id":"10"
+                                        }
+                                    ]
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
-                        },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "422":{
-                  "description":"Validation Error",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/HTTPValidationError"
+                    },
+                    "422":{
+                        "description":"Validation Error",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/HTTPValidationError"
+                                }
+                            }
                         }
-                     }
-                  }
-               }
-            }
-         },
-         "put":{
-            "summary":"Update Config Id",
-            "operationId":"update_config_id_settings__config_id__put",
-            "parameters":[
-               {
-                  "required":true,
-                  "schema":{
-                     "title":"Config Id"
-                  },
-                  "name":"config_id",
-                  "in":"path"
-               }
-            ],
-            "requestBody":{
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/Update_Config_Model"
-                     }
-                  }
-               },
-               "required":true
+                    }
+                }
             },
-            "responses":{
-               "200":{
-                  "description":"Successful Response",
-                  "content":{
-                     "application/json":{
+            "put":{
+                "summary":"Update Config Id",
+                "operationId":"update_config_id_settings__config_id__put",
+                "parameters":[
+                    {
+                        "required":true,
                         "schema":{
-                           "$ref":"#/components/schemas/Response_Config_Model"
+                            "title":"Config Id"
                         },
-                        "example":{
-                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
-                           "created_at":"2021-03-11T11:34:00.402075",
-                           "updated_at":"null",
-                           "transactionID":"business1",
-                           "instance_id": "instance1",
-                           "product_id": "product1",
-                           "topic":"test1",
-                           "networkID":1,
-                           "tenantID":"tenant1",
-                           "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:35:00",
-                           "timestampEnd":"null",
-                           "metrics":[
-                              {
-                                 "metricName":"cpu_utilization",
-                                 "metricType":"float",
-                                 "aggregationMethod":"sum",
-                                 "step":"15min",
-                                 "step_aggregation":"1h",
-                                 "next_run_at":"2021-03-11T11:45:00",
-                                 "next_aggregation":"2021-03-11T12:35:00"
-                              }
-                           ],
-                           "status":1
+                        "name":"config_id",
+                        "in":"path"
+                    }
+                ],
+                "requestBody":{
+                    "content":{
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/Update_Config_Model"
+                            }
                         }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
+                    },
+                    "required":true
+                },
+                "responses":{
+                    "200":{
+                        "description":"Successful Response",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Config_Model"
+                                },
+                                "example":{
+                                    "id":"ed7683f1-b625-4b41-a32d-3e690c4c6740",
+                                    "created_at":"2021-07-20T11:04:34.033627",
+                                    "updated_at":"null",
+                                    "transaction_id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                                    "instance_id":"21",
+                                    "product_id":"10",
+                                    "topic":"operator-a-in-0",
+                                    "monitoring_endpoint":"http://osm:4500/monitoringData?match=metric_name&start=start_time",
+                                    "timestamp_start":"2021-07-20T11:04:34.030387",
+                                    "timestamp_end":{
+                                        
+                                    },
+                                    "metrics":[
+                                        {
+                                            "metric_name":"availability",
+                                            "metric_type":"availability",
+                                            "aggregation_method":"AVG",
+                                            "step":"1m",
+                                            "step_aggregation":"2m",
+                                            "next_run_at":"2021-07-20T11:04:34.030387",
+                                            "next_aggregation":"2021-07-20T11:06:34.030387"
+                                        }
+                                    ],
+                                    "status":1,
+                                    "tenant_id":"operator-a",
+                                    "context_ids":[
+                                        {
+                                            "resource_id":"10",
+                                            "network_slice_id":"22",
+                                            "parent_id":"10"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
+                        }
+                    },
+                    "422":{
+                        "description":"Validation Error",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete":{
+                "summary":"Delete Config Id",
+                "operationId":"delete_config_id_settings__config_id__delete",
+                "parameters":[
+                    {
+                        "required":true,
                         "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
+                            "title":"Config Id"
                         },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+                        "name":"config_id",
+                        "in":"path"
+                    }
+                ],
+                "responses":{
+                    "204":{
+                        "description":"Successful Response"
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "422":{
-                  "description":"Validation Error",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/HTTPValidationError"
+                    },
+                    "422":{
+                        "description":"Validation Error",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/HTTPValidationError"
+                                }
+                            }
                         }
-                     }
-                  }
-               }
+                    }
+                }
             }
-         },
-         "delete":{
-            "summary":"Delete Config Id",
-            "operationId":"delete_config_id_settings__config_id__delete",
-            "parameters":[
-               {
-                  "required":true,
-                  "schema":{
-                     "title":"Config Id"
-                  },
-                  "name":"config_id",
-                  "in":"path"
-               }
-            ],
-            "responses":{
-               "204":{
-                  "description":"Successful Response"
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
+        },
+        "/settings/{config_id}/enable":{
+            "put":{
+                "summary":"Enable Config Id",
+                "operationId":"enable_config_id_settings__config_id__enable_put",
+                "parameters":[
+                    {
+                        "required":true,
                         "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
+                            "title":"Config Id"
                         },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+                        "name":"config_id",
+                        "in":"path"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Successful Response",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Config_Model"
+                                },
+                                "example":{
+                                    "id":"ed7683f1-b625-4b41-a32d-3e690c4c6740",
+                                    "created_at":"2021-07-20T11:04:34.033627",
+                                    "updated_at":"null",
+                                    "transaction_id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                                    "instance_id":"21",
+                                    "product_id":"10",
+                                    "topic":"operator-a-in-0",
+                                    "monitoring_endpoint":"http://osm:4500/monitoringData?match=metric_name&start=start_time",
+                                    "timestamp_start":"2021-07-20T11:04:34.030387",
+                                    "timestamp_end":{
+                                        
+                                    },
+                                    "metrics":[
+                                        {
+                                            "metric_name":"availability",
+                                            "metric_type":"availability",
+                                            "aggregation_method":"AVG",
+                                            "step":"1m",
+                                            "step_aggregation":"2m",
+                                            "next_run_at":"2021-07-20T11:04:34.030387",
+                                            "next_aggregation":"2021-07-20T11:06:34.030387"
+                                        }
+                                    ],
+                                    "status":1,
+                                    "tenant_id":"operator-a",
+                                    "context_ids":[
+                                        {
+                                            "resource_id":"10",
+                                            "network_slice_id":"22",
+                                            "parent_id":"10"
+                                        }
+                                    ]
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "422":{
-                  "description":"Validation Error",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/HTTPValidationError"
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
                         }
-                     }
-                  }
-               }
+                    },
+                    "422":{
+                        "description":"Validation Error",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
             }
-         }
-      },
-      "/settings/{config_id}/enable":{
-         "put":{
-            "summary":"Enable Config Id",
-            "operationId":"enable_config_id_settings__config_id__enable_put",
-            "parameters":[
-               {
-                  "required":true,
-                  "schema":{
-                     "title":"Config Id"
-                  },
-                  "name":"config_id",
-                  "in":"path"
-               }
-            ],
-            "responses":{
-               "200":{
-                  "description":"Successful Response",
-                  "content":{
-                     "application/json":{
+        },
+        "/settings/{config_id}/disable":{
+            "put":{
+                "summary":"Disable Config Id",
+                "operationId":"disable_config_id_settings__config_id__disable_put",
+                "parameters":[
+                    {
+                        "required":true,
                         "schema":{
-                           "$ref":"#/components/schemas/Response_Config_Model"
+                            "title":"Config Id"
                         },
-                        "example":{
-                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
-                           "created_at":"2021-03-11T11:34:00.402075",
-                           "updated_at":"null",
-                           "transactionID":"business1",
-                           "instance_id": "instance1",
-                           "product_id": "product1",
-                           "topic":"test1",
-                           "networkID":1,
-                           "tenantID":"tenant1",
-                           "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:35:00",
-                           "timestampEnd":"null",
-                           "metrics":[
-                              {
-                                 "metricName":"cpu_utilization",
-                                 "metricType":"float",
-                                 "aggregationMethod":"sum",
-                                 "step":"15min",
-                                 "step_aggregation":"1h",
-                                 "next_run_at":"2021-03-11T11:45:00",
-                                 "next_aggregation":"2021-03-11T12:35:00"
-                              }
-                           ],
-                           "status":1
+                        "name":"config_id",
+                        "in":"path"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Successful Response",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Config_Model"
+                                },
+                                "example":{
+                                    "id":"ed7683f1-b625-4b41-a32d-3e690c4c6740",
+                                    "created_at":"2021-07-20T11:04:34.033627",
+                                    "updated_at":"null",
+                                    "transaction_id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
+                                    "instance_id":"21",
+                                    "product_id":"10",
+                                    "topic":"operator-a-in-0",
+                                    "monitoring_endpoint":"http://osm:4500/monitoringData?match=metric_name&start=start_time",
+                                    "timestamp_start":"2021-07-20T11:04:34.030387",
+                                    "timestamp_end":{
+                                        
+                                    },
+                                    "metrics":[
+                                        {
+                                            "metric_name":"availability",
+                                            "metric_type":"availability",
+                                            "aggregation_method":"AVG",
+                                            "step":"1m",
+                                            "step_aggregation":"2m",
+                                            "next_run_at":"2021-07-20T11:04:34.030387",
+                                            "next_aggregation":"2021-07-20T11:06:34.030387"
+                                        }
+                                    ],
+                                    "status":0,
+                                    "tenant_id":"operator-a",
+                                    "context_ids":[
+                                        {
+                                            "resource_id":"10",
+                                            "network_slice_id":"22",
+                                            "parent_id":"10"
+                                        }
+                                    ]
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
-                        },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/Response_Error_Model"
+                                },
+                                "example":{
+                                    "status":"Error",
+                                    "message":"Error message."
+                                }
+                            }
                         }
-                     }
-                  }
-               },
-               "422":{
-                  "description":"Validation Error",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/HTTPValidationError"
+                    },
+                    "422":{
+                        "description":"Validation Error",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/HTTPValidationError"
+                                }
+                            }
                         }
-                     }
-                  }
-               }
+                    }
+                }
             }
-         }
-      },
-      "/settings/{config_id}/disable":{
-         "put":{
-            "summary":"Disable Config Id",
-            "operationId":"disable_config_id_settings__config_id__disable_put",
-            "parameters":[
-               {
-                  "required":true,
-                  "schema":{
-                     "title":"Config Id"
-                  },
-                  "name":"config_id",
-                  "in":"path"
-               }
-            ],
-            "responses":{
-               "200":{
-                  "description":"Successful Response",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Config_Model"
-                        },
-                        "example":{
-                           "id":"ab51f3e1-7b61-4f9d-85a4-9e9f366b593b",
-                           "created_at":"2021-03-11T11:34:00.402075",
-                           "updated_at":"null",
-                           "transactionID":"business1",
-                           "instance_id": "instance1",
-                           "product_id": "product1",
-                           "topic":"test1",
-                           "networkID":1,
-                           "tenantID":"tenant1",
-                           "resourceID":"resource1",
-                           "timestampStart":"2021-03-11T11:35:00",
-                           "timestampEnd":"null",
-                           "metrics":[
-                              {
-                                 "metricName":"cpu_utilization",
-                                 "metricType":"float",
-                                 "aggregationMethod":"sum",
-                                 "step":"15min",
-                                 "step_aggregation":"1h",
-                                 "next_run_at":"2021-03-11T11:45:00",
-                                 "next_aggregation":"2021-03-11T12:35:00"
-                              }
-                           ],
-                           "status":0
+        }
+    },
+    "components":{
+        "schemas":{
+            "Config_Model":{
+                "title":"Config_Model",
+                "required":[
+                    "transaction_id",
+                    "instance_id",
+                    "product_id",
+                    "topic",
+                    "monitoring_endpoint",
+                    "data_source_type",
+                    "tenant_id",
+                    "context_ids",
+                    "metrics"
+                ],
+                "type":"object",
+                "properties":{
+                    "transaction_id":{
+                        "title":"Transaction Id",
+                        "type":"string"
+                    },
+                    "instance_id":{
+                        "title":"Instance Id",
+                        "type":"string"
+                    },
+                    "product_id":{
+                        "title":"Product Id",
+                        "type":"string"
+                    },
+                    "topic":{
+                        "title":"Topic",
+                        "type":"string"
+                    },
+                    "monitoring_endpoint":{
+                        "title":"Monitoring Endpoint",
+                        "type":"string"
+                    },
+                    "data_source_type":{
+                        "title":"Data Source Type",
+                        "type":"string"
+                    },
+                    "tenant_id":{
+                        "title":"Tenant Id",
+                        "type":"string"
+                    },
+                    "context_ids":{
+                        "title":"Context Ids",
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/Context_Model"
                         }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Not Found",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Response_Error_Model"
-                        },
-                        "example":{
-                           "status":"Error",
-                           "message":"Error message."
+                    },
+                    "metrics":{
+                        "title":"Metrics",
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/Metric_Model"
                         }
-                     }
-                  }
-               },
-               "422":{
-                  "description":"Validation Error",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/HTTPValidationError"
+                    },
+                    "timestamp_start":{
+                        "title":"Timestamp Start",
+                        "type":"string",
+                        "format":"date-time"
+                    },
+                    "timestamp_end":{
+                        "title":"Timestamp End",
+                        "type":"string",
+                        "format":"date-time"
+                    }
+                }
+            },
+            "Context_Model":{
+                "title":"Context_Model",
+                "required":[
+                    "resource_id"
+                ],
+                "type":"object",
+                "properties":{
+                    "resource_id":{
+                        "title":"Resource Id",
+                        "type":"string"
+                    },
+                    "network_slice_id":{
+                        "title":"Network Slice Id",
+                        "type":"string"
+                    },
+                    "parent_id":{
+                        "title":"Parent Id",
+                        "type":"string"
+                    }
+                }
+            },
+            "HTTPValidationError":{
+                "title":"HTTPValidationError",
+                "type":"object",
+                "properties":{
+                    "detail":{
+                        "title":"Detail",
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/ValidationError"
                         }
-                     }
-                  }
-               }
+                    }
+                }
+            },
+            "Metric_Model":{
+                "title":"Metric_Model",
+                "required":[
+                    "metric_name",
+                    "metric_type",
+                    "step"
+                ],
+                "type":"object",
+                "properties":{
+                    "metric_name":{
+                        "title":"Metric Name",
+                        "type":"string"
+                    },
+                    "metric_type":{
+                        "title":"Metric Type",
+                        "type":"string"
+                    },
+                    "step":{
+                        "title":"Step",
+                        "type":"string"
+                    },
+                    "aggregation_method":{
+                        "title":"Aggregation Method",
+                        "type":"string"
+                    },
+                    "step_aggregation":{
+                        "title":"Step Aggregation",
+                        "type":"string"
+                    }
+                }
+            },
+            "Response_Config_Model":{
+                "title":"Response_Config_Model",
+                "required":[
+                    "id",
+                    "created_at",
+                    "updated_at",
+                    "transaction_id",
+                    "instance_id",
+                    "product_id",
+                    "topic",
+                    "monitoring_endpoint",
+                    "data_source_type",
+                    "tenant_id",
+                    "context_ids",
+                    "metrics"
+                ],
+                "type":"object",
+                "properties":{
+                    "id":{
+                        "title":"Id",
+                        "type":"string",
+                        "format":"uuid"
+                    },
+                    "created_at":{
+                        "title":"Created At",
+                        "type":"string",
+                        "format":"date-time"
+                    },
+                    "updated_at":{
+                        "title":"Updated At",
+                        "type":"string",
+                        "format":"date-time"
+                    },
+                    "transaction_id":{
+                        "title":"Transaction Id",
+                        "type":"string"
+                    },
+                    "instance_id":{
+                        "title":"Instance Id",
+                        "type":"string"
+                    },
+                    "product_id":{
+                        "title":"Product Id",
+                        "type":"string"
+                    },
+                    "topic":{
+                        "title":"Topic",
+                        "type":"string"
+                    },
+                    "monitoring_endpoint":{
+                        "title":"Monitoring Endpoint",
+                        "type":"string"
+                    },
+                    "data_source_type":{
+                        "title":"Data Source Type",
+                        "type":"string"
+                    },
+                    "tenant_id":{
+                        "title":"Tenant Id",
+                        "type":"string"
+                    },
+                    "context_ids":{
+                        "title":"Context Ids",
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/Context_Model"
+                        }
+                    },
+                    "metrics":{
+                        "title":"Metrics",
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/Metric_Model"
+                        }
+                    },
+                    "timestamp_start":{
+                        "title":"Timestamp Start",
+                        "type":"string",
+                        "format":"date-time"
+                    },
+                    "timestamp_end":{
+                        "title":"Timestamp End",
+                        "type":"string",
+                        "format":"date-time"
+                    }
+                }
+            },
+            "Response_Error_Model":{
+                "title":"Response_Error_Model",
+                "required":[
+                    "status",
+                    "message"
+                ],
+                "type":"object",
+                "properties":{
+                    "status":{
+                        "title":"Status",
+                        "type":"string"
+                    },
+                    "message":{
+                        "title":"Message",
+                        "type":"string"
+                    }
+                }
+            },
+            "Update_Config_Model":{
+                "title":"Update_Config_Model",
+                "type":"object",
+                "properties":{
+                    "timestamp_end":{
+                        "title":"Timestamp End",
+                        "type":"string",
+                        "format":"date-time"
+                    },
+                    "metrics":{
+                        "title":"Metrics",
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/Metric_Model"
+                        }
+                    }
+                }
+            },
+            "ValidationError":{
+                "title":"ValidationError",
+                "required":[
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "type":"object",
+                "properties":{
+                    "loc":{
+                        "title":"Location",
+                        "type":"array",
+                        "items":{
+                            "type":"string"
+                        }
+                    },
+                    "msg":{
+                        "title":"Message",
+                        "type":"string"
+                    },
+                    "type":{
+                        "title":"Error Type",
+                        "type":"string"
+                    }
+                }
             }
-         }
-      }
-   },
-   "components":{
-      "schemas":{
-         "Config_Model":{
-            "title":"Config_Model",
-            "required":[
-               "transaction_id",
-               "instance_id",
-               "product_id",
-               "topic",
-               "monitoring_endpoint",
-               "data_source_type",
-               "tenant_id",
-               "context_ids",
-               "metrics"
-            ],
-            "type":"object",
-            "properties":{
-               "transaction_id":{
-                  "title":"Business Id",
-                  "type":"string"
-               },
-               "instance_id":{
-                  "title": "instance Id",
-                  "type": "string"
-               },
-               "product_id":{
-                  "title": "product Id",
-                  "type": "string"
-               },
-               "topic":{
-                  "title":"Topic",
-                  "type":"string"
-               },
-               "monitoring_endpoint":{
-                  "title":"Monitoring Endpoint",
-                  "type":"string"
-               },
-               "data_source_type":{
-                  "title":"Data Source Type",
-                  "type":"string"
-               },
-               "tenant_id":{
-                  "title":"Tenant Id",
-                  "type":"string"
-               },
-               "context_ids":{
-                  "title":"Context Ids",
-                  "type":"array",
-                  "items":{
-                     "$ref":"#/components/schemas/Context_Model"
-                  }
-               },
-               "metrics":{
-                  "title":"Metrics",
-                  "type":"array",
-                  "items":{
-                     "$ref":"#/components/schemas/Metric_Model"
-                  }
-               },
-               "timestamp_start":{
-                  "title":"Timestamp Start",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "timestamp_end":{
-                  "title":"Timestamp End",
-                  "type":"string",
-                  "format":"date-time"
-               }
-            }
-         },
-         "Context_Model":{
-            "title":"Context_Model",
-            "required":[
-               "resource_id"
-            ],
-            "type":"object",
-            "properties":{
-               "resource_id":{
-                  "title":"Resource Id",
-                  "type":"string"
-               },
-               "network_slice_id":{
-                  "title":"Network Slice Id",
-                  "type":"string"
-               },
-               "parent_id":{
-                  "title":"Parent Id",
-                  "type":"string"
-               }
-            }
-         },
-         "HTTPValidationError":{
-            "title":"HTTPValidationError",
-            "type":"object",
-            "properties":{
-               "detail":{
-                  "title":"Detail",
-                  "type":"array",
-                  "items":{
-                     "$ref":"#/components/schemas/ValidationError"
-                  }
-               }
-            }
-         },
-         "Metric_Model":{
-            "title":"Metric_Model",
-            "required":[
-               "metric_name",
-               "metric_type",
-               "step"
-            ],
-            "type":"object",
-            "properties":{
-               "metric_name":{
-                  "title":"Metric Name",
-                  "type":"string"
-               },
-               "metric_type":{
-                  "title":"Metric Type",
-                  "type":"string"
-               },
-               "step":{
-                  "title":"Step",
-                  "type":"string"
-               },
-               "aggregation_method":{
-                  "title":"Aggregation Method",
-                  "type":"string"
-               },
-               "step_aggregation":{
-                  "title":"Step Aggregation",
-                  "type":"string"
-               }
-            }
-         },
-         "Response_Config_Model":{
-            "title":"Response_Config_Model",
-            "required":[
-               "id",
-               "created_at",
-               "updated_at",
-               "transaction_id",
-               "instance_id",
-               "product_id",
-               "monitoring_endpoint",
-               "topic",
-               "resource_id",
-               "network_id",
-               "parent_id",
-               "timestamp_start",
-               "metrics",
-               "status",
-               "tenant_id",
-            ],
-            "type":"object",
-            "properties":{
-               "id":{
-                  "title":"Id",
-                  "type":"string",
-                  "format":"uuid"
-               },
-               "created_at":{
-                  "title":"Created At",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "updated_at":{
-                  "title":"Updated At",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "transaction_id":{
-                  "title":"Business Id",
-                  "type":"string"
-               },
-               "instance_id":{
-                  "title": "instance Id",
-                  "type": "string"
-               },
-               "product_id":{
-                  "title": "product Id",
-                  "type": "string"
-               },
-               "monitoring_endpoint":{
-                  "title":"Monitoring Endpoint",
-                  "type":"string"
-               },
-               "topic":{
-                  "title":"Topic",
-                  "type":"string"
-               },
-               "resource_id":{
-                  "title":"Resource Id",
-                  "type":"string"
-               },
-               "network_id":{
-                  "title":"Network Id",
-                  "type":"string"
-               },
-               "parent_id":{
-                  "title":"Parent Id",
-                  "type":"string"
-               },
-               "timestamp_start":{
-                  "title":"Timestamp Start",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "timestamp_end":{
-                  "title":"Timestamp End",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "metrics":{
-                  "title":"Metrics",
-                  "type":"array",
-                  "items":{
-                     "$ref":"#/components/schemas/Response_Metric_Model"
-                  }
-               },
-               "status":{
-                  "title":"Status",
-                  "type":"integer"
-               },
-               "tenant_id":{
-                  "title":"Tenant Id",
-                  "type":"string"
-               },
-            }
-         },
-         "Response_Error_Model":{
-            "title":"Response_Error_Model",
-            "required":[
-               "status",
-               "message"
-            ],
-            "type":"object",
-            "properties":{
-               "status":{
-                  "title":"Status",
-                  "type":"string"
-               },
-               "message":{
-                  "title":"Message",
-                  "type":"string"
-               }
-            }
-         },
-         "Response_Metric_Model":{
-            "title":"Response_Metric_Model",
-            "required":[
-               "metric_name",
-               "metric_type",
-               "step",
-               "next_run_at"
-            ],
-            "type":"object",
-            "properties":{
-               "metric_name":{
-                  "title":"Metric Name",
-                  "type":"string"
-               },
-               "metric_type":{
-                  "title":"Metric Type",
-                  "type":"string"
-               },
-               "step":{
-                  "title":"Step",
-                  "type":"string"
-               },
-               "aggregation_method":{
-                  "title":"Aggregation Method",
-                  "type":"string"
-               },
-               "step_aggregation":{
-                  "title":"Step Aggregation",
-                  "type":"string"
-               },
-               "next_run_at":{
-                  "title":"Next Run At",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "next_aggregation":{
-                  "title":"Next Aggregation",
-                  "type":"string",
-                  "format":"date-time"
-               }
-            }
-         },
-         "Update_Config_Model":{
-            "title":"Update_Config_Model",
-            "type":"object",
-            "properties":{
-               "timestamp_end":{
-                  "title":"Timestamp End",
-                  "type":"string",
-                  "format":"date-time"
-               },
-               "metrics":{
-                  "title":"Metrics",
-                  "type":"array",
-                  "items":{
-                     "$ref":"#/components/schemas/Metric_Model"
-                  }
-               }
-            }
-         },
-         "ValidationError":{
-            "title":"ValidationError",
-            "required":[
-               "loc",
-               "msg",
-               "type"
-            ],
-            "type":"object",
-            "properties":{
-               "loc":{
-                  "title":"Location",
-                  "type":"array",
-                  "items":{
-                     "type":"string"
-                  }
-               },
-               "msg":{
-                  "title":"Message",
-                  "type":"string"
-               },
-               "type":{
-                  "title":"Error Type",
-                  "type":"string"
-               }
-            }
-         }
-      }
-   }
+        }
+    }
 }
