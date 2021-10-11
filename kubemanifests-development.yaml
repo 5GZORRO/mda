@@ -4,7 +4,7 @@ items:
     kind: Service
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
@@ -16,6 +16,7 @@ items:
         - name: "4000"
           port: 4000
           targetPort: 4000
+          nodePort: 30036
       selector:
         io.kompose.service: mda
     status:
@@ -24,7 +25,7 @@ items:
     kind: Service
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
@@ -44,7 +45,7 @@ items:
     kind: Service
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests.yaml
+        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
@@ -56,6 +57,7 @@ items:
         - name: "4500"
           port: 4500
           targetPort: 4500
+          nodePort: 30037
       selector:
         io.kompose.service: osm
     status:
@@ -64,7 +66,7 @@ items:
     kind: Deployment
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
@@ -80,40 +82,18 @@ items:
       template:
         metadata:
           annotations:
-            kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+            kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
             kompose.version: 1.22.0 (955b78124)
           creationTimestamp: null
           labels:
             io.kompose.service: mda
         spec:
           containers:
-            - env:
-                - name: KAFKA_HOST
-                  value: "172.31.8.183"
-                - name: KAFKA_PORT
-                  value: "9092"
-                - name: POSTGRES_DB
-                  value: mda
-                - name: POSTGRES_PW
-                  value: postgres
-                - name: POSTGRES_HOST
-                  value: postgres
-                - name: POSTGRES_PORT
-                  value: "5432"
-                - name: POSTGRES_USER
-                  value: postgres
-                - name: RESET_DB
-                  value: "true"
-                - name: NUM_READING_THREADS
-                  value: "10"
-                - name: NUM_AGGREGATION_THREADS
-                  value: "10"
-                - name: OSM_QUERY
-                  value: "monitoringData?match=metric_name&start=start_time"
-                - name: SPECTRUM_QUERY
-                  value: "TBD"
+            - name: mda
               image: docker.pkg.github.com/5gzorro/mda/mda_production:latest
-              name: mda
+              envFrom:
+              - secretRef:
+                  name: env-file
               ports:
                 - containerPort: 4000
               resources: {}
@@ -132,7 +112,7 @@ items:
     kind: Deployment
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
@@ -148,22 +128,18 @@ items:
       template:
         metadata:
           annotations:
-            kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+            kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
             kompose.version: 1.22.0 (955b78124)
           creationTimestamp: null
           labels:
             io.kompose.service: postgres
         spec:
           containers:
-            - env:
-                - name: POSTGRES_DB
-                  value: postgres
-                - name: POSTGRES_PASSWORD
-                  value: postgres
-                - name: POSTGRES_USER
-                  value: postgres
+            - name: mda-bd
+              envFrom:
+              - secretRef:
+                  name: env-file
               image: postgres
-              name: mda-bd
               ports:
                 - containerPort: 5432
               resources: {}
@@ -180,7 +156,7 @@ items:
     kind: Deployment
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests.yaml
+        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
@@ -195,20 +171,18 @@ items:
       template:
         metadata:
           annotations:
-            kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests.yaml
+            kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
             kompose.version: 1.22.0 (955b78124)
           creationTimestamp: null
           labels:
             io.kompose.service: osm
         spec:
           containers:
-            - env:
-                - name: MIN_AVAILABILITY
-                  value: "0.90"
-                - name: MAX_AVAILABILITY
-                  value: "0.99"
+            - name: osm
+              envFrom:
+              - secretRef:
+                  name: env-file
               image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
-              name: osm
               ports:
                 - containerPort: 4500
               resources: {}
