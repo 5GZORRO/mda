@@ -86,13 +86,13 @@ The following table displays the endpoints used in the development scenario:
 
 **Endpoint**|**Description**|**Method**
 |:----|:----|:----
-`http://<IP>:4000/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
-`http://<IP>:4000/settings/:id/enable`|Enable a certain monitoring spec|PUT
-`http://<IP>:4000/settings/:id/disable`|Disable the current monitoring spec|PUT
-`http://<IP>:4000/settings/:id`|Modify the current monitoring spec|PUT
-`http://<IP>:4000/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
-`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
-`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
+`http://<IP>:<MDA_PORT>/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
+`http://<IP>:<MDA_PORT>/settings/:id/enable`|Enable a certain monitoring spec|PUT
+`http://<IP>:<MDA_PORT>/settings/:id/disable`|Disable the current monitoring spec|PUT
+`http://<IP>:<MDA_PORT>/settings/:id`|Modify the current monitoring spec|PUT
+`http://<IP>:<MDA_PORT>/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
+`http://<IP>:<MDA_PORT>/settings`|Retrieve all the existing monitoring specs|GET
+`http://<IP>:<MDA_PORT>/settings/:id`|Delete a certain existing monitoring specs|DELETE
 
 
 ### Deployment Instructions
