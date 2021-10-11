@@ -48,6 +48,8 @@ class Orchestrator():
                         "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
                         "metricValue" : json_data["data"]["result"][0]["values"][0][1],
                         "resourceID" : resourceID,
+                        "instanceID": instanceID,
+                        "productID": productID,
                         "timestamp" : str(next_run_at)
                     }
                     
@@ -58,9 +60,7 @@ class Orchestrator():
                     data = {
                         "operatorID" : tenantID,
                         "transactionID" : transactionID,
-                        "networkID" : networkID,
-                        "instanceID": instanceID,
-                        "productID": productID
+                        "networkID" : networkID
                     }
                     data["monitoringData"] = monitoringData
                     send_kafka(data, dataHash, kafka_topic)

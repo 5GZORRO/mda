@@ -27,6 +27,8 @@ class Aggregator():
                 "metricName" : metric_name,
                 "metricValue" : value,
                 "resourceID" : resourceID,
+                "instanceID": instanceID,
+                "productID": productID,
                 "timestamp" : str(next_run_at),
                 "aggregationMethod": aggregation
             }
@@ -38,9 +40,7 @@ class Aggregator():
             data = {
                 "operatorID" : tenantID,
                 "transactionID" : transactionID,
-                "networkID" : networkID,
-                "instanceID": instanceID,
-                "productID": productID
+                "networkID" : networkID
             }
             data["monitoringData"] = monitoringData
 

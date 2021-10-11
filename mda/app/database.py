@@ -1,6 +1,6 @@
 from .main import *
 
-engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PW + '@' + POSTGRES_HOST + ':' + POSTGRES_PORT + '/' + POSTGRES_DB, pool_size=num_fetch_threads+num_fetch_threads_agg, convert_unicode=True)
+engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PASSWORD + '@' + POSTGRES_HOST + ':' + POSTGRES_PORT + '/' + POSTGRES_DB, pool_size=num_fetch_threads+num_fetch_threads_agg, convert_unicode=True)
 # Create database if it does not exist.
 if not database_exists(engine.url):
   create_database(engine.url)
