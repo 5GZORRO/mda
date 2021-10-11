@@ -20,38 +20,18 @@ We tender a confluence page available online describing the intended full pipeli
 This section covers all the needs a developer has to get deployment of the production mda component.
 
 #### Prerequisites
-For run this component, we need to define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
-Also, it is required to have PostgreSQL installed on the machine. For Ubuntu 20.04, to use the apt repository, follow these steps:
-```
-# Create the file repository configuration:
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-
-# Import the repository signing key:
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-
-# Update the package lists:
-sudo apt-get update
-
-# Install the latest version of PostgreSQL.
-sudo apt-get -y install postgresql
-
-# If you want to install a specific version, you can use postgresql-version instead of postgresql. For example, to install PostgreSQL version 12, you use the following command:
-sudo apt-get install postgresql-12
-
-# When you installed PostgreSQL, the installation process created a user account called postgres associated with the default postgres role. To connect to PostgreSQL using the postgres role, you switch over to the postgres account on your server by typing:
-sudo -i -u postgres
-
-# It will prompt for the password of the current user. You need to provide the password and hit the Enter keyboard.
-```
-
-#### Deploy components
-The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
+For run this component in production, we need:
+* Create the ".env" environment variable file from the [template](https://github.com/5GZORRO/mda/blob/main/.env_template).
+* Deployment in a production environment uses a github component package. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
 ```
 $ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
 ```
- * **Note:** If it is required to utilize the personal access token and you do not possess that feature, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+**Note:** If it is required to utilize the personal access token and you do not possess that feature, you can see [here](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
-Then, for build and up the docker compose we have:
+#### Deploy components
+ 
+##### Deploy in Docker
+For build and up the docker compose we have:
 ```
 $ docker-compose -f docker-compose-production.yml up --build
 ```
@@ -59,6 +39,27 @@ $ docker-compose -f docker-compose-production.yml up --build
 ```
 $ docker-compose -f docker-compose-production.yml up --build <component_name>
 ```
+To stop the services, we can do:
+```
+$ docker-compose -f docker-compose-production.yml down
+```
+
+##### Deploy in Kubernetes
+To run the Kubernetes component, we first need to create secret kubernetes with the environment variables. For this we have to run the command:
+```
+$ kubectl create secret generic env-file --from-env-file=.env
+```
+So, to run the service we can run:
+```
+$ kubectl apply -f kubemanifests-production.yaml
+```
+To stop services and clear secrets, we can do:
+```
+$ kubectl delete deployments mda postgres
+$ kubectl delete service mda postgres
+$ kubectl delete secret env-file
+```
+
 ### Persistence detail
 
 In case MDA goes down when the reload occurs, it is standard to have data loss (no requests were made to the data source for the period that the component was down). For the still-active monitoring specs when MDA reloads, the next run fields are updated accordingly with the current time and their steps.
@@ -98,15 +99,38 @@ The following table displays the endpoints used in the development scenario:
 This section covers all the needs a developer has to get deployment of the development scenario.
 
 #### Prerequisites
-For run this component, we need:
-* Define some environment variables in file [.env](https://github.com/5GZORRO/mda/blob/main/.env).
-* Install PostgreSQL database as mentioned previously
+For run this component in development, we need:
+* Create the ".env" environment variable file from the [template](https://github.com/5GZORRO/mda/blob/main/.env_template).
+* Install PostgreSQL database. For Ubuntu 20.04, to use the apt repository, follow these steps:
+```
+# Create the file repository configuration:
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import the repository signing key:
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# Update the package lists:
+sudo apt-get update
+
+# Install the latest version of PostgreSQL.
+sudo apt-get -y install postgresql
+
+# If you want to install a specific version, you can use postgresql-version instead of postgresql. For example, to install PostgreSQL version 12, you use the following command:
+sudo apt-get install postgresql-12
+
+# When you installed PostgreSQL, the installation process created a user account called postgres associated with the default postgres role. To connect to PostgreSQL using the postgres role, you switch over to the postgres account on your server by typing:
+sudo -i -u postgres
+
+# It will prompt for the password of the current user. You need to provide the password and hit the Enter keyboard.
+```
 * Run the kafka compose with:
 ```
 $ docker-compose -f docker-compose-kafka.yml up --build
 ```
 
 #### Deploy components
+
+##### Deploy in Docker
 For build and up the docker compose we have:
 ```
 $ docker-compose -f docker-compose-development.yml up --build
@@ -114,6 +138,22 @@ $ docker-compose -f docker-compose-development.yml up --build
  * **Note:** If you want to deploy only one component, you can use:
 ```
 $ docker-compose -f docker-compose-development.yml up --build <component_name>
+```
+
+##### Deploy in Kubernetes
+To run the Kubernetes component, we first need to create secret kubernetes with the environment variables. For this we have to run the command:
+```
+$ kubectl create secret generic env-file --from-env-file=.env
+```
+So, to run the service we can run:
+```
+$ kubectl apply -f kubemanifests-development.yaml
+```
+To stop services and clear secrets, we can do:
+```
+$ kubectl delete deployments mda osm postgres
+$ kubectl delete service mda osm postgres
+$ kubectl delete secret env-file
 ```
 
 ## API Reference
