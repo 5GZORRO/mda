@@ -6,6 +6,19 @@
 # mda
 This is the __5GZORRO's Monitoring Data Aggregator__ component responsible for collecting, signing and pushing monitoring data, provided by each Resource and Service Provider, towards the Data Lake. As monitoring data is presented over time, it can also be aggregated and made available in a proper manner to perform the desired analytics.
 
+### Available endpoints
+The following table displays the endpoints available:
+
+**Endpoint**|**Description**|**Method**
+|:----|:----|:----
+`http://<IP>:<MDA_PORT>/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
+`http://<IP>:<MDA_PORT>/settings/:id/enable`|Enable a certain monitoring spec|PUT
+`http://<IP>:<MDA_PORT>/settings/:id/disable`|Disable the current monitoring spec|PUT
+`http://<IP>:<MDA_PORT>/settings/:id`|Modify the current monitoring spec|PUT
+`http://<IP>:<MDA_PORT>/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
+`http://<IP>:<MDA_PORT>/settings`|Retrieve all the existing monitoring specs|GET
+`http://<IP>:<MDA_PORT>/settings/:id`|Delete a certain existing monitoring specs|DELETE
+
 ## Production
 
 ### Pipeline Description
@@ -80,20 +93,6 @@ Currently, our pipeline is composed of five main steps, each one held for:
 3. Metric __aggregation__, via TimescaleDB aggregation operation (if the case)
 4. __Hash/signing__ data with operator's key making use of SHA256 and RSA algorithms
 5. __Inject__ data into a DL Kafka Topic
-
-### Supported Endpoints
-The following table displays the endpoints used in the development scenario:
-
-**Endpoint**|**Description**|**Method**
-|:----|:----|:----
-`http://<IP>:<MDA_PORT>/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
-`http://<IP>:<MDA_PORT>/settings/:id/enable`|Enable a certain monitoring spec|PUT
-`http://<IP>:<MDA_PORT>/settings/:id/disable`|Disable the current monitoring spec|PUT
-`http://<IP>:<MDA_PORT>/settings/:id`|Modify the current monitoring spec|PUT
-`http://<IP>:<MDA_PORT>/settings/:id`|Retrieve all the monitoring specs associated with a given id|GET
-`http://<IP>:<MDA_PORT>/settings`|Retrieve all the existing monitoring specs|GET
-`http://<IP>:<MDA_PORT>/settings/:id`|Delete a certain existing monitoring specs|DELETE
-
 
 ### Deployment Instructions
 This section covers all the needs a developer has to get deployment of the development scenario.
