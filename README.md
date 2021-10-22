@@ -68,8 +68,8 @@ $ kubectl apply -f kubemanifests-production.yaml
 ```
 To stop services and clear secrets, do:
 ```
-$ kubectl delete deployments mda postgres
-$ kubectl delete service mda postgres
+$ kubectl delete deployments mda postgres-mda
+$ kubectl delete service mda postgres-mda
 $ kubectl delete secret env-file
 ```
 
@@ -150,8 +150,8 @@ $ kubectl apply -f kubemanifests-development.yaml
 ```
 To stop services and clear secrets, do:
 ```
-$ kubectl delete deployments mda osm postgres
-$ kubectl delete service mda osm postgres
+$ kubectl delete deployments mda postgres-mda dummy-osm-mda
+$ kubectl delete service mda postgres-mda dummy-osm-mda
 $ kubectl delete secret env-file
 ```
 
