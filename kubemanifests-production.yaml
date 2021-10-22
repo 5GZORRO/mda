@@ -29,8 +29,8 @@ items:
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
-        io.kompose.service: postgres
-      name: postgres
+        io.kompose.service: postgres-mda
+      name: postgres-mda
     spec:
       type: NodePort
       ports:
@@ -38,7 +38,7 @@ items:
           port: 5432
           targetPort: 5432
       selector:
-        io.kompose.service: postgres
+        io.kompose.service: postgres-mda
     status:
       loadBalancer: {}
   - apiVersion: apps/v1
@@ -95,13 +95,13 @@ items:
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
-        io.kompose.service: postgres
-      name: postgres
+        io.kompose.service: postgres-mda
+      name: postgres-mda
     spec:
       replicas: 1
       selector:
         matchLabels:
-          io.kompose.service: postgres
+          io.kompose.service: postgres-mda
       strategy:
         type: Recreate
       template:
@@ -111,7 +111,7 @@ items:
             kompose.version: 1.22.0 (955b78124)
           creationTimestamp: null
           labels:
-            io.kompose.service: postgres
+            io.kompose.service: postgres-mda
         spec:
           containers:
             - name: mda-bd
