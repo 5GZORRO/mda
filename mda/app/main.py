@@ -164,7 +164,9 @@ t2.start(block=False)
 # ----------------------- MAIN APP -------------------------------#
 # ----------------------------------------------------------------#
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/"
+)
 
 @app.on_event("shutdown")
 def shutdown_event():
