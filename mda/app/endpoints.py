@@ -3,18 +3,20 @@ from .main import *
 @app.post("/settings", status_code=201, responses={201: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def set_param(config: Config_Model):
 
+  config.data_source_type = config.data_source_type.upper()
+  if config.data_source_type not in resources_options:
+      return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
+  if config.timestamp_start == None:
+    config.timestamp_start = datetime.datetime.now()
+  if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
+    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
   for metric in config.metrics:
-    if metric.aggregation_method != None and metric.aggregation_method.upper() not in agg_options:
+    metric.aggregation_method = metric.aggregation_method.upper()
+    if metric.aggregation_method != None and metric.aggregation_method not in agg_options:
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
     if metric.step_aggregation != None and metric.step_aggregation[-1] not in step_options and metric.step[-1] not in step_options:
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Step and step aggregation options is "+str(step_options)+"."})
-  if config.timestamp_start == None:
-    config.timestamp_start = datetime.datetime.now()
-  # elif config.timestamp_start < datetime.datetime.now() - relativedelta(minutes=1):
-  #   return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after current now."})
-  if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
-    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
-  
+    
   # create public/private keys if not created 
   if config.tenant_id not in public_private_keys:
     public_key, private_key = rsa.newkeys(1024)

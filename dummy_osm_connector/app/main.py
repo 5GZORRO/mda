@@ -81,7 +81,7 @@ def generate_availability():
 
 # ----------------------------------------------------------------#
 
-@app.get("/query")
+@app.get("/osm/api/v1/query")
 async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(None)):
     # /query_range?query=up&
     #              time=2015-07-01T20:10:30.781Z
@@ -126,7 +126,7 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
 
     return response
 
-@app.get("/query_range")
+@app.get("/osm/api/v1/query_range")
 async def query_range(start: datetime, query: str, end: datetime = None, step: str = None, X_Gravitee_Api_Key: str = Header(None)):
     # /query_range?query=up&
     #              start=2015-07-01T20:10:30.781Z&

@@ -22,13 +22,14 @@ class Orchestrator():
     def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, productID):
         
         try:
-            #request_metric = "match="+metric_name+"&"
-            #request_schedule = "start="+str(next_run_at) 
-            # curl TBD to 'http://localhost:9090/api/v1/query=cpu_utilization&time=2015-07-01T20:10:51'
-            endpoint = monitoring_endpoint.replace("metric_name", metric_name)
-            endpoint = endpoint.replace("start_time", str(next_run_at))
-            #request_url = endpoint + request_metric + request_schedule
-            response = requests.get(endpoint)
+            osm_headers = {
+              "X-Gravitee-Api-Key": OSM_KEY
+            }
+            query_params = {
+              'query': metric_name,
+              'time': str(next_run_at)
+            }
+            response = requests.get(monitoring_endpoint, params=query_params, headers=osm_headers)
             if response.status_code != 200:
                 info_log(400, "Request to OSM not sucessful")
                 #print(f'Error: Request to OSM not successful')

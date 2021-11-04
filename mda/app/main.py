@@ -40,9 +40,7 @@ try:
   NUM_READING_THREADS = int(os.environ["NUM_READING_THREADS"])
   NUM_AGGREGATION_THREADS = int(os.environ["NUM_AGGREGATION_THREADS"])
 
-  OSM_QUERY = os.environ["OSM_QUERY"]
-  SPECTRUM_QUERY = os.environ["SPECTRUM_QUERY"] 
-  #publicKeyOperator = os.environ["OPERATOR_PUBLIC_KEY"]
+  OSM_KEY = os.environ["OSM_KEY"]
 except Exception as e:
   print("Environment variable does not exists: " + str(e))
   sys.exit(0)
@@ -52,8 +50,8 @@ json_response_enable = {"id": "ed7683f1-b625-4b41-a32d-3e690c4c6740", "created_a
 json_response_disable = json_response_enable.copy()
 json_response_disable['status'] = 0
 
+resources_options = ['OSM']
 agg_options = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'STDDEV']
-
 step_options = ['s', 'm', 'h', 'd', 'w']
 
 # public and private keys by tenant
