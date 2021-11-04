@@ -30,11 +30,12 @@ class Orchestrator():
               'time': str(next_run_at)
             }
             response = requests.get(monitoring_endpoint, params=query_params, headers=osm_headers)
+            code = response.status_code
+            resp = response.text
             if response.status_code != 200:
-                info_log(400, "Request to OSM not sucessful")
+                info_log(400, "Request to OSM not sucessful: "+str(code)+" - "+str(resp))
                 #print(f'Error: Request to OSM not successful')
                 return('Error in fetching data!', 200)
-            resp = response.text
             json_data = json.loads(resp)
             info_log(None, f'Response from OSM: {resp}')
             
