@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, Header
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -79,27 +79,64 @@ def generate_availability():
     else:
         return initial_value
 
-    '''
-    total_availability = 20
-    options = [round(random.uniform(float(MIN_AVAILABILITY), float(MAX_AVAILABILITY)), 2)]
-        
-    for num in range(total_availability):
-        options.append(1)
-
-    return float(random.choice(options))
-    '''
-
 # ----------------------------------------------------------------#
 
-@app.get("/monitoringData")
-async def monitoring_data(start: datetime, match: List[str] = Query([], min_length=1), end: datetime = None, step: str = None):
-    # /monitoringData?match[]=up&match[]=up&
-    #            start=2015-07-01T20:10:30.781Z&
-    #            end=2015-07-01T20:11:00.781Z&
-    #            step=1m
+@app.get("/query")
+async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(None)):
+    # /query_range?query=up&
+    #              time=2015-07-01T20:10:30.781Z
 
-    if len(match) < 1:
-        return JSONResponse(status_code=404, content={"status": "Error", "message": "Match required."})
+    if X_Gravitee_Api_Key == None:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "Header 'X-Gravitee-Api-Key' required."})
+    if query == None:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "Query required."})
+    
+    # Random response
+    if generate_response() == '500':
+      return JSONResponse(status_code=500, content={"status": "Error", "message": "Faild to connect to OSM."})
+
+    response = {
+        "status": "success",
+        "data": {
+            "resultType" : "matrix",
+            "result" : []
+        }
+    }
+    json_metric = {
+        "metric": {
+            "__name__" : query,
+            "job" : "prometheus",
+            "instance" : "http://5gzorro_osm.com"
+        },
+        "values": []
+    }
+    if query == "cpu_utilization":
+        json_metric['values'].append([datetime.timestamp(time), round(random.uniform(0,1),2)])
+    
+    elif query == "availability":
+        json_metric['values'].append([datetime.timestamp(time), round(generate_availability(), 2)])
+
+    elif query == "error":
+        json_metric['values'].append([datetime.timestamp(time), round(1 - generate_availability(), 2)])
+
+    else:
+        json_metric['values'].append([datetime.timestamp(time), round(random.uniform(0,1),2)])
+
+    response['data']['result'].append(json_metric)
+
+    return response
+
+@app.get("/query_range")
+async def query_range(start: datetime, query: str, end: datetime = None, step: str = None, X_Gravitee_Api_Key: str = Header(None)):
+    # /query_range?query=up&
+    #              start=2015-07-01T20:10:30.781Z&
+    #              end=2015-07-01T20:11:00.781Z&
+    #              step=1m
+
+    if X_Gravitee_Api_Key == None:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "Header 'X-Gravitee-Api-Key' required."})
+    if query == None:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "Query required."})
     if start != None and end != None and start >= end:
         return JSONResponse(status_code=404, content={"status": "Error", "message": "Start is greater or equals than the end."})
     if end != None and step is None:
@@ -127,28 +164,27 @@ async def monitoring_data(start: datetime, match: List[str] = Query([], min_leng
             "result" : []
         }
     }
-    for metric in match:
-        json_metric = {
-            "metric": {
-                "__name__" : metric,
-                "job" : "prometheus",
-                "instance" : "http://5gzorro_osm.com"
-            },
-            "values": []
-        }
-        for date in dates:
-            if metric == "cpu_utilization":
-                json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
-            
-            elif metric == "availability":
-                json_metric['values'].append([datetime.timestamp(date), round(generate_availability(), 2)])
+    json_metric = {
+        "metric": {
+            "__name__" : query,
+            "job" : "prometheus",
+            "instance" : "http://5gzorro_osm.com"
+        },
+        "values": []
+    }
+    for date in dates:
+        if query == "cpu_utilization":
+            json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
+        
+        elif query == "availability":
+            json_metric['values'].append([datetime.timestamp(date), round(generate_availability(), 2)])
 
-            elif metric == "error":
-                json_metric['values'].append([datetime.timestamp(date), round(1 - generate_availability(), 2)])
+        elif query == "error":
+            json_metric['values'].append([datetime.timestamp(date), round(1 - generate_availability(), 2)])
 
-            else:
-                json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
+        else:
+            json_metric['values'].append([datetime.timestamp(date), round(random.uniform(0,1),2)])
 
-        response['data']['result'].append(json_metric)
+    response['data']['result'].append(json_metric)
 
     return response
