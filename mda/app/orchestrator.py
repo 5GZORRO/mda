@@ -27,7 +27,7 @@ class Orchestrator():
             }
             query_params = {
               'query': metric_name,
-              'time': str(next_run_at)
+              'time': str(next_run_at).replace(' ', 'T') + 'Z'
             }
             response = requests.get(monitoring_endpoint, params=query_params, headers=osm_headers)
             code = response.status_code
