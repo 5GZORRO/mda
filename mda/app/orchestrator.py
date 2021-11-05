@@ -38,17 +38,18 @@ class Orchestrator():
                 return('Error in fetching data!', 200)
             json_data = json.loads(resp)
             info_log(None, f'Response from OSM: {resp}')
+            metric_value = json_data["data"]["result"][0]["value"][0][1]
             
             if aggregation != None:
                 #Save value in db
-                insert_metric_value(metric_id, json_data["data"]["result"][0]["values"][0][1], next_run_at)
+                insert_metric_value(metric_id, metric_value, next_run_at)
             else:
                 if json_data["data"]["result"] != []:
                     
                     # Create JSON object that will be sent to DL Kafka Topic
                     monitoringData = {
                         "metricName" : json_data["data"]["result"][0]["metric"]["__name__"],
-                        "metricValue" : json_data["data"]["result"][0]["values"][0][1],
+                        "metricValue" : metric_value,
                         "resourceID" : resourceID,
                         "instanceID": instanceID,
                         "productID": productID,
@@ -66,7 +67,7 @@ class Orchestrator():
                     }
                     data["monitoringData"] = monitoringData
                     send_kafka(data, dataHash, kafka_topic)
-                    print('SEND DATA-> '+str(next_run_at)+' -> '+ str(json_data["data"]["result"][0]["values"][0][1]), flush=True)
+                    print('SEND DATA-> '+str(next_run_at)+' -> '+ str(metric_value), flush=True)
             return 1
 
         except Exception as e:
