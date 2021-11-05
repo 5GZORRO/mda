@@ -38,7 +38,7 @@ class Orchestrator():
                 return('Error in fetching data!', 200)
             json_data = json.loads(resp)
             info_log(None, f'Response from OSM: {resp}')
-            metric_value = json_data["data"]["result"][0]["value"][0][1]
+            metric_value = json_data["data"]["result"][0]["value"][1]
             
             if aggregation != None:
                 #Save value in db
