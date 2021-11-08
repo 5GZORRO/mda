@@ -19,7 +19,7 @@ class Orchestrator():
 
         return aux[0]
 
-    def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, productID):
+    def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, productID, producer):
         
         try:
             osm_headers = {
@@ -37,8 +37,20 @@ class Orchestrator():
                 #print(f'Error: Request to OSM not successful')
                 return('Error in fetching data!', 200)
             json_data = json.loads(resp)
-            info_log(None, f'Response from OSM: {resp}')
-            metric_value = json_data["data"]["result"][0]["value"][1]
+            result = json_data["data"]["result"]
+            
+            if len(result) == 0:
+                info_log(400, 'Erro in request_orchestrator: No values to read')
+                return 0
+            
+            value = result[0]["value"][1]
+            try:
+                metric_value = float(value)
+            except:
+                info_log(400, 'Erro in request_orchestrator: Value [' + str(value) + '] is an invalid numeric data')
+                return 0
+            
+            info_log(200, f'Response from OSM: {resp}')
             
             if aggregation != None:
                 #Save value in db
@@ -66,7 +78,7 @@ class Orchestrator():
                         "networkID" : networkID
                     }
                     data["monitoringData"] = monitoringData
-                    send_kafka(data, dataHash, kafka_topic)
+                    send_kafka(data, dataHash, kafka_topic, producer)
                     print('SEND DATA-> '+str(next_run_at)+' -> '+ str(metric_value), flush=True)
             return 1
 

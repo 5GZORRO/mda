@@ -10,7 +10,7 @@ def validate_uuid4(uuid_string):
   	return False
   return True
 
-def send_kafka(data, dataHash, kafka_topic):
+def send_kafka(data, dataHash, kafka_topic, producer):
   try:
     payload_encoded = {k: str(v).encode('utf-8') for k, v in dataHash.items()}
     hashData = {k: hashlib.sha256(v).hexdigest() for k,v in payload_encoded.items()}
@@ -23,15 +23,14 @@ def send_kafka(data, dataHash, kafka_topic):
     dataHashEncrypt = {rsa.encrypt(k.encode(), private_key): rsa.encrypt(v.encode(), private_key) for k,v in hashData.items()}
     #info_log(None, f'Signup Data: {dataHashEncrypt}')
   
-    producer = KafkaProducer(bootstrap_servers=[KAFKA_HOST+':'+KAFKA_PORT], value_serializer=lambda x: json.dumps(x).encode('utf-8'), api_version=(0,10,1))
     producer.send(kafka_topic, key=list(dataHashEncrypt.values())[0],  value=data)
     info_log(200, f'Post metric {data["monitoringData"]["metricName"]}, from operator {data["operatorID"]}, into DL Kafka Topic {kafka_topic} [Post Time: {data["monitoringData"]["timestamp"]}]')
     return 1
   except Exception as e:
-    info_log(400, 'Erro in request_orchestrator: ' + str(e))
+    info_log(400, 'Erro in send_kafka: ' + str(e))
     return 0
 
-def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator):
+def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator, producer):
   try:
     while True:
       next_item = queue.get()
@@ -42,12 +41,12 @@ def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator)
 
           #Send aggregation
           info_log(None, f'{datetime.datetime.now()} - UC1: Aggregating values from metric: {next_item[5]} (Step Aggregation Associated: {next_item[14]})')
-          aggregator.send_aggregation(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[14], next_item[13], next_item[15], next_item[16])
+          aggregator.send_aggregation(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[14], next_item[13], next_item[15], next_item[16], producer)
           update_aggregation(next_item[4], next_item[0])
         
         else:
           #Send metric
-          orchestrator.request_orchestrator(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[16], next_item[17])
+          orchestrator.request_orchestrator(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[16], next_item[17], producer)
           info_log(None, f'{datetime.datetime.now()} - UC2: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[2]}')
           update_next_run(next_item[4], next_item[0])
 

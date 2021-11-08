@@ -111,17 +111,15 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
     }
     if query == "cpu_utilization":
         json_metric['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
+        response['data']['result'].append(json_metric)
     
     elif query == "availability":
         json_metric['value'] = [datetime.timestamp(time), str(round(generate_availability(), 2))]
+        response['data']['result'].append(json_metric)
 
     elif query == "error":
-        json_metric['value'] = [datetime.timestamp(time), str(round(1 - generate_availability(), 2))]
-
-    else:
-        json_metric['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
-
-    response['data']['result'].append(json_metric)
+        json_metric['value'] = [datetime.timestamp(time), "string"]
+        response['data']['result'].append(json_metric)
 
     return response
 
@@ -173,17 +171,15 @@ async def query_range(start: datetime, query: str, end: datetime = None, step: s
     }
     for date in dates:
         if query == "cpu_utilization":
-            json_metric['values'].append([datetime.timestamp(date), str(round(random.uniform(0,1),2))])
+            json_metric['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
+            response['data']['result'].append(json_metric)
         
         elif query == "availability":
-            json_metric['values'].append([datetime.timestamp(date), str(round(generate_availability(), 2))])
-
+            json_metric['value'] = [datetime.timestamp(time), str(round(generate_availability(), 2))]
+            response['data']['result'].append(json_metric)
+    
         elif query == "error":
-            json_metric['values'].append([datetime.timestamp(date), str(round(1 - generate_availability(), 2))])
-
-        else:
-            json_metric['values'].append([datetime.timestamp(date), str(round(random.uniform(0,1),2))])
-
-    response['data']['result'].append(json_metric)
+            json_metric['value'] = [datetime.timestamp(time), "string"]
+            response['data']['result'].append(json_metric)
 
     return response

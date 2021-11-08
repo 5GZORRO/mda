@@ -51,12 +51,7 @@ async def get_all_configs():
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in get config in database."})
   return resp
 
-@app.put("/settings/{config_id}", responses={200: {"model": Response_Config_Model,
-												   "content": {"application/json": {
-															   "example": json_response_enable}}},
-											 404: {"model": Response_Error_Model,
-												   "content": {"application/json": {
-															   "example": {"status": "Error", "message": "Error message."}}}}})
+@app.put("/settings/{config_id}", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
 async def update_config_id(config_id, config: Update_Config_Model):
 
   # Update config by id

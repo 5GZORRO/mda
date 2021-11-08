@@ -71,6 +71,9 @@ from .aggregator import *
 orchestrator = Orchestrator()
 aggregator = Aggregator()
 
+#Kafka Producer
+producer = KafkaProducer(bootstrap_servers=[KAFKA_HOST+':'+KAFKA_PORT], value_serializer=lambda x: json.dumps(x).encode('utf-8'), api_version=(0,10,1))
+
 # --------------------- START SCRIPT -----------------------------#
 # ----------------------------------------------------------------#
 # Load database metrics to wait queue
@@ -82,12 +85,12 @@ aggregator.update_first_aggregation_aux()
 
 # Set up threads
 for i in range(num_fetch_threads):
-	worker = Thread(target = queue_consumer, args = (i, orchestrator.metrics_queue, 0, orchestrator, aggregator))
+	worker = Thread(target = queue_consumer, args = (i, orchestrator.metrics_queue, 0, orchestrator, aggregator, producer))
 	worker.setDaemon(True)
 	worker.start()
  
 for i in range(num_fetch_threads_agg):
-	worker = Thread(target = queue_consumer, args = (i, aggregator.aggregation_queue, 1, orchestrator, aggregator))
+	worker = Thread(target = queue_consumer, args = (i, aggregator.aggregation_queue, 1, orchestrator, aggregator, producer))
 	worker.setDaemon(True)
 	worker.start()
 

@@ -19,9 +19,13 @@ class Aggregator():
 
         return aux[0]
 
-    def send_aggregation(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, next_aggregation, step_aggregation, instanceID, productID):
+    def send_aggregation(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, next_aggregation, step_aggregation, instanceID, productID, producer):
         try:
             value = get_last_aggregation(metric_id, aggregation, next_aggregation, step_aggregation)
+            if value is None:
+                info_log(400, 'Erro in send_aggregation: No values to aggregate')
+                return 0
+                
             # Create JSON object that will be sent to DL Kafka Topic
             monitoringData = {
                 "metricName" : metric_name,
@@ -45,7 +49,7 @@ class Aggregator():
             data["monitoringData"] = monitoringData
 
             # send to kafka
-            send_kafka(data, dataHash, kafka_topic)
+            send_kafka(data, dataHash, kafka_topic, producer)
 
             print('SEND AGGREGATION-> '+str(next_run_at)+' -> '+ str(value), flush=True)
             return 1
