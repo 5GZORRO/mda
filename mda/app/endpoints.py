@@ -11,9 +11,10 @@ async def set_param(config: Config_Model):
   if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
   for metric in config.metrics:
-    metric.aggregation_method = metric.aggregation_method.upper()
-    if metric.aggregation_method != None and metric.aggregation_method not in agg_options:
-      return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
+    if metric.aggregation_method != None:
+      metric.aggregation_method = metric.aggregation_method.upper()
+      if metric.aggregation_method not in agg_options:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
     if metric.step_aggregation != None and metric.step_aggregation[-1] not in step_options and metric.step[-1] not in step_options:
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Step and step aggregation options is "+str(step_options)+"."})
     
