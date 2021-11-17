@@ -1,12 +1,11 @@
 apiVersion: v1
 items:
+
+  # services
+  # mda
   - apiVersion: v1
     kind: Service
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests-production.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: mda
       name: mda
@@ -21,13 +20,11 @@ items:
         io.kompose.service: mda
     status:
       loadBalancer: {}
+
+  # postgres
   - apiVersion: v1
     kind: Service
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests-production.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: postgres-mda
       name: postgres-mda
@@ -41,13 +38,12 @@ items:
         io.kompose.service: postgres-mda
     status:
       loadBalancer: {}
+
+  # deployments
+  # mda
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests-production.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: mda
       name: mda
@@ -60,10 +56,6 @@ items:
         type: Recreate
       template:
         metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests-production.yaml
-            kompose.version: 1.22.0 (955b78124)
-          creationTimestamp: null
           labels:
             io.kompose.service: mda
         spec:
@@ -81,19 +73,17 @@ items:
                   name: mda-claim0
           imagePullSecrets:
             - name: regcred-mda
-          restartPolicy: Always
           volumes:
             - name: mda-claim0
               persistentVolumeClaim:
                 claimName: mda-claim0
+          restartPolicy: Always
     status: {}
+
+  # postgres
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests-production.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: postgres-mda
       name: postgres-mda
@@ -106,10 +96,6 @@ items:
         type: Recreate
       template:
         metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-production.yml -o kubemanifests-production.yaml
-            kompose.version: 1.22.0 (955b78124)
-          creationTimestamp: null
           labels:
             io.kompose.service: postgres-mda
         spec:
@@ -125,43 +111,11 @@ items:
               volumeMounts:
                 - mountPath: /mnt/postgres
                   name: mda-postgres-claim0
-          restartPolicy: Always
           volumes:
             - name: mda-postgres-claim0
               persistentVolumeClaim:
                 claimName: mda-postgres-claim0
-    status: {}
-
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      labels:
-        io.kompose.service: mda-postgres-claim0
-      name: mda-postgres-claim0
-    spec:
-      storageClassName: postgresvolume
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
-    status: {}
-
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      labels:
-        io.kompose.service: mda-claim0
-      name: mda-claim0
-    spec:
-      storageClassName: mdavolume
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
+          restartPolicy: Always
     status: {}
 
   # persistent volume
@@ -173,13 +127,13 @@ items:
       labels:
         type: local
     spec:
-      storageClassName: postgresvolume
+      storageClassName: manual
       capacity:
         storage: 100Mi
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/data"
+        path: "/mnt/mda/postgres/production"
 
   # mda
   - apiVersion: v1
@@ -189,12 +143,47 @@ items:
       labels:
         type: local
     spec:
-      storageClassName: mdavolume
+      storageClassName: manual
       capacity:
         storage: 100Mi
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/data"
+        path: "/mnt/mda/logs/production"
+
+  # persistent volume claim
+  # postgres
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        io.kompose.service: mda-postgres-claim0
+      name: mda-postgres-claim0
+    spec:
+      storageClassName: manual
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+
+  # mda
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: mda-claim0
+      name: mda-claim0
+    spec:
+      storageClassName: manual
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+
 kind: List
 metadata: {}
