@@ -109,7 +109,7 @@ items:
                 - containerPort: 5432
               resources: {}
               volumeMounts:
-                - mountPath: /mnt/postgres
+                - mountPath: /var/lib/postgresql/data
                   name: mda-postgres-claim0
           volumes:
             - name: mda-postgres-claim0
@@ -133,7 +133,7 @@ items:
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/mda/postgres/production"
+        path: "/mnt/mda/postgres"
 
   # mda
   - apiVersion: v1
@@ -149,7 +149,7 @@ items:
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/mda/logs/production"
+        path: "/mnt/mda/logs"
 
   # persistent volume claim
   # postgres
