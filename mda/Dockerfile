@@ -1,4 +1,4 @@
-FROM python-3.7.3-alpine3.10
+FROM python:3.10.0-alpine3.15
 
 ENV TZ="Europe/Lisbon"
 
