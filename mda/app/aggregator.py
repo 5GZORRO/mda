@@ -21,7 +21,7 @@ class Aggregator():
 
     def send_aggregation(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, next_aggregation, step_aggregation, instanceID, productID, producer):
         try:
-            value = get_last_aggregation(metric_id, aggregation, next_aggregation, step_aggregation)
+            value = get_last_aggregation(metric_id, aggregation, next_run_at, step_aggregation)
             if value is None:
                 info_log(400, 'Erro in send_aggregation: No values to aggregate')
                 return 0
@@ -58,6 +58,7 @@ class Aggregator():
             info_log(400, 'Erro in request_aggregator: ' + str(e))
             return 0
 
+    '''
     def check_waiting_aggregations(self):
 
         while True:
@@ -81,3 +82,4 @@ class Aggregator():
                 
                 self.first_aggregation_aux = self.update_first_aggregation_aux()
         return
+    '''

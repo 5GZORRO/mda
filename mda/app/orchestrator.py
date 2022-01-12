@@ -87,6 +87,7 @@ class Orchestrator():
             info_log(400, 'Erro in request_orchestrator: ' + str(e))
             return 0
     
+    '''
     def check_waiting_metrics(self):
 
         while True:
@@ -114,3 +115,4 @@ class Orchestrator():
                 
                 self.first_metric_aux = self.update_first_metric_aux()
         return
+    '''
