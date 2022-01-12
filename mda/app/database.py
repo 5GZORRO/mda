@@ -387,58 +387,24 @@ def insert_metric_value(metric_id, metric_value, timestamp):
     print(e)
     return -1
 
-''' Not used now
-def create_aggregate_view(metric_id, aggregation_method, step_aggregation):
-  global db_session
-  db_session.execute("CREATE VIEW \"agg_"+str(metric_id)+"_"+aggregation_method+"\" " \
-                     "WITH (timescaledb.continuous) AS " \
-                     "SELECT time_bucket(\'"+step_aggregation+"\', timestamp) AS bucket, "+aggregation_method+"(metric_value) AS aggregation " \
-                     "FROM value " \
-                     "WHERE metric_id = '"+str(metric_id)+"' " \
-                     "GROUP BY bucket;")
-  db_session.commit()
-  return
-
-def drop_aggregate_view(metric_id, aggregation_method):
-  db_session.execute("DROP VIEW IF EXISTS \"agg_"+str(metric_id)+"_"+aggregation_method+"\" CASCADE;")
-  db_session.commit()
-  return
-'''
-
 def get_last_aggregation(metric_id, aggregation_method, bucket, step_aggregation):
 
-  #result = db_session.execute("REFRESH VIEW \"agg_"+str(metric_id)+"_"+aggregation_method+"\";" \
-  #                            "SELECT * FROM \""+str(metric_id)+"_"+aggregation_method+"\" LIMIT 1;").fetchone()
+  where_condition = "WHERE metric_id = '"+str(metric_id)+"' and timestamp < '"+str(bucket)+"'::timestamp and " \
+                          "timestamp >= ('"+str(bucket)+"'::timestamp - interval '"+str(step_aggregation)+"');"
+                          
   result = db_session.execute("SELECT "+aggregation_method+"(metric_value) " \
-                              "FROM value " \
-                              "WHERE metric_id = '"+str(metric_id)+"' and timestamp < '"+str(bucket)+"'::timestamp " \
-                                    "and timestamp >= ('"+str(bucket)+"'::timestamp - interval '"+str(step_aggregation)+"');").fetchone()
+                              "FROM value " + where_condition).fetchone()
+  
+  # Delete old data
+  db_session.execute("DELETE FROM value " + where_condition)
+  
   return result[0]
 
 def create_index():
 
-  #db_session.execute("CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;" \
-  #                   "CREATE INDEX value_index ON value (timestamp ASC, metric_id);" \
-  #                   "SELECT create_hypertable('value', 'timestamp', if_not_exists => TRUE);")
   db_session.execute("CREATE INDEX value_index ON value (timestamp ASC, metric_id);")
   db_session.commit()
   return
-
-'''
-def drop_all_views():
-  global db_session
-  result = db_session.execute("SELECT 'DROP VIEW \"' || table_name || '\" CASCADE;' " \
-                              "FROM information_schema.views " \
-                              "WHERE table_schema NOT IN ('pg_catalog', 'information_schema') AND " \
-                                    "table_name !~ '^pg_' AND table_name LIKE 'agg_%';")
-  for row in result:
-    try:
-      db_session.execute(row[0])
-    except Exception:
-      pass
-  db_session.commit()
-  return
-'''
 
 def close_connection():
 
