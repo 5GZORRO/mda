@@ -116,6 +116,10 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
     elif query == "availability":
         json_metric['value'] = [datetime.timestamp(time), str(round(generate_availability(), 2))]
         response['data']['result'].append(json_metric)
+        
+    elif query == "up":
+        json_metric['value'] = [datetime.timestamp(time), "1"]
+        response['data']['result'].append(json_metric)
 
     elif query == "error":
         json_metric['value'] = [datetime.timestamp(time), "string"]
@@ -176,6 +180,10 @@ async def query_range(start: datetime, query: str, end: datetime = None, step: s
         
         elif query == "availability":
             json_metric['value'] = [datetime.timestamp(time), str(round(generate_availability(), 2))]
+            response['data']['result'].append(json_metric)
+            
+        elif query == "up":
+            json_metric['value'] = [datetime.timestamp(time), "1"]
             response['data']['result'].append(json_metric)
     
         elif query == "error":
