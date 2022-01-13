@@ -48,10 +48,6 @@ To build and up the container we have:
 ```
 $ docker-compose -f docker-compose-production.yml up --build
 ```
- * **Note:** If you want to deploy only one component, you can use:
-```
-$ docker-compose -f docker-compose-production.yml up --build <component_name>
-```
 To stop the services, we can do:
 ```
 $ docker-compose -f docker-compose-production.yml down
