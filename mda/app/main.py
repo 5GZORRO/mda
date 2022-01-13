@@ -94,17 +94,6 @@ for i in range(num_fetch_threads_agg):
 	worker.setDaemon(True)
 	worker.start()
 
-'''
-# waiting for metrics and aggregations
-worker_metrics = Thread(target = orchestrator.check_waiting_metrics, args = ())
-worker_metrics.setDaemon(True)
-worker_metrics.start()
-
-worker_aggregations = Thread(target = aggregator.check_waiting_aggregations, args = ())
-worker_aggregations.setDaemon(True)
-worker_aggregations.start()
-'''
-
 # Check waiting metrics
 tl = Timeloop()
 logging.getLogger("timeloop").setLevel(logging.CRITICAL)
@@ -119,6 +108,7 @@ def check_waiting_metrics():
     metric = list(orchestrator.wait_queue.get())
     #print('ADD METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
     orchestrator.metrics_queue.put(tuple(metric))
+    
     # Delete old metric
     sec_to_add = convert_to_seconds(metric[2])
     metric[0] = metric[0] - relativedelta(seconds=sec_to_add)
@@ -126,6 +116,7 @@ def check_waiting_metrics():
     while tuple(metric) in orchestrator.metrics_queue.queue:
       #print('DELETE METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
       del orchestrator.metrics_queue.queue[orchestrator.metrics_queue.queue.index(tuple(metric))]
+    
     # Add next to wait queue
     metric[0] = metric[0] + relativedelta(seconds=sec_to_add*2)
     #print('WAIT METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
@@ -147,14 +138,17 @@ def check_waiting_aggregations():
   if aggregator.first_aggregation_aux != None and str(aggregator.first_aggregation_aux) <= str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")):
     # Add to execution queue
     metric = list(aggregator.wait_queue_agg.get())
-    # Delete old metric
-    while metric in aggregator.aggregation_queue.queue:
-      #print('DELETE AGGREGATION -> ' + str(metric[4]) + ' -> ' + str(metric[0]))
-      del aggregator.aggregation_queue.queue[aggregator.aggregation_queue.queue.index(metric)]
     aggregator.aggregation_queue.put(tuple(metric))
-    # Add next to wait queue
+    
+    # Delete old metric
     sec_to_add = convert_to_seconds(metric[13])
-    metric[0] = metric[0] + relativedelta(seconds=sec_to_add)
+    metric[0] = metric[0] - relativedelta(seconds=sec_to_add)
+    while tuple(metric) in aggregator.aggregation_queue.queue:
+      #print('DELETE AGGREGATION -> ' + str(metric[4]) + ' -> ' + str(metric[0]))
+      del aggregator.aggregation_queue.queue[aggregator.aggregation_queue.queue.index(tuple(metric))]
+    
+    # Add next to wait queue
+    metric[0] = metric[0] + relativedelta(seconds=sec_to_add*2)
     aggregator.wait_queue_agg.put(tuple(metric))
 
     aggregator.first_aggregation_aux = aggregator.update_first_aggregation_aux()

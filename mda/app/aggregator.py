@@ -57,29 +57,3 @@ class Aggregator():
             print('send_aggregation-> ' + str(e))
             info_log(400, 'Erro in request_aggregator: ' + str(e))
             return 0
-
-    '''
-    def check_waiting_aggregations(self):
-
-        while True:
-
-            if self.update_queue_flag_agg:
-                self.first_aggregation_aux = self.update_first_aggregation_aux()
-                self.update_queue_flag_agg = False
-                
-            if self.first_aggregation_aux != None and str(self.first_aggregation_aux) <= str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")):
-                # Add to execution queue
-                metric = list(self.wait_queue_agg.get())
-                # Delete old metric
-                while metric in self.aggregation_queue.queue:
-                    #print('DELETE AGGREGATION -> ' + str(metric[4]) + ' -> ' + str(metric[0]))
-                    del self.aggregation_queue.queue[self.aggregation_queue.queue.index(metric)]
-                self.aggregation_queue.put(tuple(metric))
-                # Add next to wait queue
-                sec_to_add = convert_to_seconds(metric[14])
-                metric[0] = metric[0] + relativedelta(seconds=sec_to_add)
-                self.wait_queue_agg.put(tuple(metric))
-                
-                self.first_aggregation_aux = self.update_first_aggregation_aux()
-        return
-    '''

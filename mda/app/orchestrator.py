@@ -86,33 +86,3 @@ class Orchestrator():
             print('request_orchestrator-> ' + str(e))
             info_log(400, 'Erro in request_orchestrator: ' + str(e))
             return 0
-    
-    '''
-    def check_waiting_metrics(self):
-
-        while True:
-
-            if self.update_queue_flag:
-                self.first_metric_aux = self.update_first_metric_aux()
-                self.update_queue_flag = False
-            
-            if self.first_metric_aux != None and str(self.first_metric_aux) <= str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")):
-                # Add to execution queue
-                metric = list(self.wait_queue.get())
-                #print('ADD METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
-                self.metrics_queue.put(tuple(metric))
-                # Delete old metric
-                sec_to_add = convert_to_seconds(metric[2])
-                metric[0] = metric[0] - relativedelta(seconds=sec_to_add)
-                #print('METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
-                while tuple(metric) in self.metrics_queue.queue:
-                    #print('DELETE METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
-                    del self.metrics_queue.queue[self.metrics_queue.queue.index(tuple(metric))]
-                # Add next to wait queue
-                metric[0] = metric[0] + relativedelta(seconds=sec_to_add*2)
-                #print('WAIT METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
-                self.wait_queue.put(tuple(metric))
-                
-                self.first_metric_aux = self.update_first_metric_aux()
-        return
-    '''
