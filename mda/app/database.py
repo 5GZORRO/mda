@@ -320,6 +320,8 @@ def disable_config(config_id, orchestrator, aggregator):
       metric.status = 0
       add_metrics['metrics'].append(metric.toString())
       delete_metric_queue(metric._id, orchestrator, aggregator)
+      # Delete old data
+      Value.query.filter_by(metric_id=metric._id).delete()
     db_session.commit()
     return add_metrics
   except Exception as e:
@@ -438,6 +440,8 @@ try:
   resp1 = Config.query.first()
   resp2 = Metric.query.first()
   resp3 = Value.query.first()
+  # Delete old data
+  Value.query.delete()
 except Exception as e:
   try:
     Base.metadata.create_all(bind=engine)
