@@ -16,7 +16,7 @@ items:
         - name: "4000"
           port: 4000
           targetPort: 4000
-          nodePort: 30036
+          nodePort: 30038
       selector:
         io.kompose.service: mda
     status:
@@ -37,6 +37,7 @@ items:
         - name: "5432"
           port: 5432
           targetPort: 5432
+          nodePort: 30037
       selector:
         io.kompose.service: postgres-mda
     status:
@@ -57,7 +58,7 @@ items:
         - name: "4500"
           port: 4500
           targetPort: 4500
-          nodePort: 30037
+          nodePort: 30036
       selector:
         io.kompose.service: dummy-osm-mda
     status:
@@ -144,7 +145,7 @@ items:
                 - containerPort: 5432
               resources: {}
               volumeMounts:
-                - mountPath: /mnt/postgres
+                - mountPath: /var/lib/postgresql/data
                   name: mda-postgres-claim0
           restartPolicy: Always
           volumes:
@@ -238,7 +239,7 @@ items:
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/data"
+        path: "/mnt/mda/postgres"
 
   # mda
   - apiVersion: v1
@@ -254,6 +255,6 @@ items:
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/data"
+        path: "/mnt/mda/logs"
 kind: List
 metadata: {}
