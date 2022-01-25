@@ -240,40 +240,38 @@ def update_config(config_id, config, orchestrator, aggregator):
     print(e)
     return -1
 
-def update_next_run(metric_id, next_run_at):
-
-  try:
-    metric = Metric.query.filter_by(_id=metric_id).first()
-    config = Config.query.filter_by(_id=metric.config_id).first()
-    sec_to_add = convert_to_seconds(metric.step)
-    next = next_run_at + relativedelta(seconds=sec_to_add)
-    if config.timestamp_end != None and next > config.timestamp_end:
-      metric.status = 0
-      db_session.commit()
-    else:
-      metric.next_run_at = next
-      db_session.commit()
-    return 1
-  except Exception as e:
-    print(e)
-    return -1
-
-def update_aggregation(metric_id, next_aggregation):
+def update_next_run(metric_id, next):
   
   try:
     metric = Metric.query.filter_by(_id=metric_id).first()
     config = Config.query.filter_by(_id=metric.config_id).first()
-    sec_to_add = convert_to_seconds(metric.step_aggregation)
-    next = next_aggregation + relativedelta(seconds=sec_to_add)
-    if config.timestamp_end != None and next > config.timestamp_end:
+    if config.timestamp_end != None and next > str(config.timestamp_end):
       metric.status = 0
+      config.status = 0
       db_session.commit()
-    else:
-      metric.next_aggregation = next
-      db_session.commit()
+      return 0
+    metric.next_run_at = next
+    db_session.commit()
     return 1
   except Exception as e:
-    print(e)
+    print("update_next_run: " + str(e))
+    return -1
+
+def update_aggregation(metric_id, next):
+  
+  try:
+    metric = Metric.query.filter_by(_id=metric_id).first()
+    config = Config.query.filter_by(_id=metric.config_id).first()
+    if config.timestamp_end != None and next > str(config.timestamp_end):
+      metric.status = 0
+      config.status = 0
+      db_session.commit()
+      return 0
+    metric.next_aggregation = next
+    db_session.commit()
+    return 1
+  except Exception as e:
+    print("update_aggregation: " + str(e))
     return -1
 
 def enable_config(config_id, orchestrator, aggregator):

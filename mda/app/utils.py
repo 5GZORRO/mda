@@ -42,14 +42,12 @@ def queue_consumer(thread_identifier, queue, flag_agg, orchestrator, aggregator,
           #Send aggregation
           info_log(None, f'{datetime.datetime.now()} - UC1: Aggregating values from metric: {next_item[5]} (Step Aggregation Associated: {next_item[0]})')
           aggregator.send_aggregation(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[14], next_item[13], next_item[15], next_item[16], producer)
-          update_aggregation(next_item[4], next_item[0])
-        
+          
         else:
           #Send metric
-          orchestrator.request_orchestrator(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[16], next_item[17], producer)
+          orchestrator.request_orchestrator(next_item[5], next_item[12], next_item[0], next_item[11], next_item[8], next_item[10], next_item[9], next_item[7], next_item[4], next_item[15], next_item[16], next_item[17], producer, next_item[2])
           info_log(None, f'{datetime.datetime.now()} - UC2: Fetching values from OSM, metric: {next_item[5]} (Step Associated: {next_item[0]}')
-          update_next_run(next_item[4], next_item[0])
-
+          
       queue.task_done()
   except Exception as e:
     print(e)

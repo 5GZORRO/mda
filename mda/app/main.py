@@ -119,14 +119,14 @@ def check_waiting_metrics():
     
     # Add next to wait queue
     metric[0] = metric[0] + relativedelta(seconds=sec_to_add*2)
-    #print('WAIT METRIC -> ' + str(metric[5]) + ' -> ' + str(metric[0]))
-    orchestrator.wait_queue.put(tuple(metric))
+    if update_next_run(metric[4], str(metric[0])) != 0:
+      orchestrator.wait_queue.put(tuple(metric))
 
     orchestrator.first_metric_aux = orchestrator.update_first_metric_aux()
   return
 tl.start(block=False)
 
-# Check waiting metrics
+# Check waiting aggregations
 t2 = Timeloop()
 logging.getLogger("timeloop").setLevel(logging.CRITICAL)
 @t2.job(interval=timedelta(seconds=0.01))
@@ -149,7 +149,8 @@ def check_waiting_aggregations():
     
     # Add next to wait queue
     metric[0] = metric[0] + relativedelta(seconds=sec_to_add*2)
-    aggregator.wait_queue_agg.put(tuple(metric))
+    if update_aggregation(metric[4], str(metric[0])) != 0:
+      aggregator.wait_queue_agg.put(tuple(metric))
 
     aggregator.first_aggregation_aux = aggregator.update_first_aggregation_aux()
 
