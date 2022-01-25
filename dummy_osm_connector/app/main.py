@@ -109,7 +109,7 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
             "instance" : "http://5gzorro_osm.com"
         }
     }
-    if query == "cpu_utilization":
+    if query == "osm_requests":
         json_metric['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
         response['data']['result'].append(json_metric)
     
@@ -174,7 +174,7 @@ async def query_range(start: datetime, query: str, end: datetime = None, step: s
         "values": []
     }
     for date in dates:
-        if query == "cpu_utilization":
+        if query == "osm_requests":
             json_metric['values'].append([datetime.timestamp(date), str(round(random.uniform(0,1),2))])
         
         elif query == "availability":
