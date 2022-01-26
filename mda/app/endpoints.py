@@ -8,7 +8,7 @@ async def set_param(config: Config_Model):
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
   if config.timestamp_start == None:
     config.timestamp_start = datetime.datetime.now()
-  if config.timestamp_start < datetime.datetime.now():
+  elif config.timestamp_start < datetime.datetime.now():
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp_start has to be after current time."})
   if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start has to be after timestamp end."})
