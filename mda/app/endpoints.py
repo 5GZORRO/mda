@@ -8,15 +8,26 @@ async def set_param(config: Config_Model):
       return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
   if config.timestamp_start == None:
     config.timestamp_start = datetime.datetime.now()
+  if config.timestamp_start < datetime.datetime.now():
+    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp_start has to be after current time."})
   if config.timestamp_end != None and config.timestamp_start > config.timestamp_end:
-    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start need to be after timestamp end."})
+    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start has to be after timestamp end."})
   for metric in config.metrics:
-    if metric.aggregation_method != None:
-      metric.aggregation_method = metric.aggregation_method.upper()
-      if metric.aggregation_method not in agg_options:
-        return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
-    if metric.step_aggregation != None and metric.step_aggregation[-1] not in step_options and metric.step[-1] not in step_options:
-      return JSONResponse(status_code=404, content={"status": "Error", "message": "Step and step aggregation options is "+str(step_options)+"."})
+    if metric.step[-1] not in step_options:
+      return JSONResponse(status_code=404, content={"status": "Error", "message": "Step options is "+str(step_options)+"."})
+    #Aggregation params
+    if metric.aggregation_method != None or metric.step_aggregation != None:
+      if metric.aggregation_method != None:
+        metric.aggregation_method = metric.aggregation_method.upper()
+        if metric.aggregation_method not in agg_options:
+          return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
+      else:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "For aggregation we need the aggregation_method defined."})
+      if metric.step_aggregation != None:
+        if metric.step_aggregation[-1] not in step_options:
+          return JSONResponse(status_code=404, content={"status": "Error", "message": "Step aggregation options is "+str(step_options)+"."})
+      else:
+        return JSONResponse(status_code=404, content={"status": "Error", "message": "For aggregation we need the step_aggregation defined."})
     
   # create public/private keys if not created 
   if config.tenant_id not in public_private_keys:
@@ -64,7 +75,7 @@ async def update_config_id(config_id, config: Update_Config_Model):
   if resp == 1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Arguments invalid."})
   if resp == 2:
-    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp end must be superior to the actual."})
+    return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp end  has to be after current time."})
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in update config in database."})
   orchestrator.update_queue_flag = True
