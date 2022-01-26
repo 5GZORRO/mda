@@ -38,11 +38,17 @@ class Orchestrator():
             json_data = json.loads(resp)
             result = json_data["data"]["result"]
             
-            if len(result) == 0:
+            # Search metric value by network_slice_id
+            value = None
+            for result in json_data['data']['result']:
+                if result['metric']['ns_id'] == '15cce067-4818-4afc-b0f8-0e4a1babf753':
+                    value = result['value'][1]
+                    break
+                    
+            if value == None:
                 info_log(400, 'Erro in request_orchestrator: No values to read')
                 return "Error"
             
-            value = result[0]["value"][1]
             try:
                 metric_value = float(value)
             except:
@@ -63,7 +69,7 @@ class Orchestrator():
         try:
             metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_name, str(next_run_at).replace(' ', 'T') + 'Z')
             if metric_value == "Error":
-                info_log(400, 'Erro in request_orchestrator: get_value_orchestrator invalid')
+                #info_log(400, 'Erro in request_orchestrator: get_value_orchestrator invalid')
                 return 0
                 
             if metric_name == "osm_requests":

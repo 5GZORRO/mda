@@ -102,28 +102,35 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
             "result" : []
         }
     }
-    json_metric = {
-        "metric": {
-            "__name__" : query,
-            "job" : "prometheus",
-            "instance" : "http://5gzorro_osm.com"
-        }
-    }
-    if query == "osm_requests":
-        json_metric['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
-        response['data']['result'].append(json_metric)
+    for i in range(2):
+      json_metric = {
+          "metric": {
+              "__name__" : query,
+              "job" : "mon_exporter",
+              "instance" : "mon:8000",
+              "ns_id": str(i)+"5cce067-4818-4afc-b0f8-0e4a1babf753",
+              "ns_name": "test"+str(i)+"_instance",
+              "project_id": str(i)+"b0d7475-319f-48ce-a216-92b85f7800a8",
+              "vdu_name": "test-"+str(i)+"-mgmtVM-0",
+              "vnf_member_index": str(i)
+          }
+      }
     
-    elif query == "availability":
-        json_metric['value'] = [datetime.timestamp(time), str(round(generate_availability(), 2))]
-        response['data']['result'].append(json_metric)
-        
-    elif query == "up":
-        json_metric['value'] = [datetime.timestamp(time), "1"]
-        response['data']['result'].append(json_metric)
-
-    elif query == "error":
-        json_metric['value'] = [datetime.timestamp(time), "string"]
-        response['data']['result'].append(json_metric)
+      if query == "osm_requests":
+          json_metric['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
+          response['data']['result'].append(json_metric)
+      
+      elif query == "availability":
+          json_metric['value'] = [datetime.timestamp(time), str(round(generate_availability(), 2))]
+          response['data']['result'].append(json_metric)
+          
+      elif query == "up":
+          json_metric['value'] = [datetime.timestamp(time), "1"]
+          response['data']['result'].append(json_metric)
+  
+      elif query == "error":
+          json_metric['value'] = [datetime.timestamp(time), "string"]
+          response['data']['result'].append(json_metric)
 
     return response
 
