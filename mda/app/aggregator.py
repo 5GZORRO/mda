@@ -23,7 +23,7 @@ class Aggregator():
         try:
             value = get_last_aggregation(metric_id, aggregation, next_run_at, step_aggregation)
             if value is None:
-                info_log(400, 'Erro in send_aggregation: No values to aggregate')
+                info_log(metric_id, 'ERROR', 'Erro in send_aggregation: No values to aggregate')
                 return 0
                 
             # Create JSON object that will be sent to DL Kafka Topic
@@ -49,11 +49,12 @@ class Aggregator():
             data["monitoringData"] = monitoringData
 
             # send to kafka
-            send_kafka(data, dataHash, kafka_topic, producer)
+            send_kafka(metric_id, data, dataHash, kafka_topic, producer)
 
-            print('SEND AGGREGATION-> '+str(next_run_at)+' -> '+ str(value), flush=True)
+            print('SEND AGGREGATION -> '+str(next_run_at)+' -> '+ str(value), flush=True)
+            info_log(metric_id, 'SUCCESS', 'Send aggregation: '+str(next_run_at)+' -> '+ str(value))
             return 1
         except Exception as e:
-            print('send_aggregation-> ' + str(e))
-            info_log(400, 'Erro in request_aggregator: ' + str(e))
+            #print('aggregator:send_aggregation -> ' + str(e), flush=True)
+            info_log(metric_id, 'ERROR', 'Error in aggregator:request_aggregator: ' + str(e))
             return 0

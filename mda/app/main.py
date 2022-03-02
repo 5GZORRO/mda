@@ -19,9 +19,14 @@ import psycopg2.extras
 from dateutil.relativedelta import relativedelta
 from timeloop import Timeloop
 from datetime import timedelta
-logging.basicConfig(filename='logs/'+'mda.json', level=logging.CRITICAL, format='{ "timestamp": "%(asctime)s.%(msecs)03dZ", %(message)s}', datefmt='%Y-%m-%dT%H:%M:%S')
+logging.basicConfig(filename='logs/'+'mda.json', level=logging.CRITICAL, format="%(asctime)s.%(msecs)03dZ | %(message)s", datefmt='%Y-%m-%dT%H:%M:%S')
 logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
 logging.getLogger("kafka").setLevel(logging.CRITICAL)
+
+def info_log(metric_id, level, message):
+  if metric_id == None:
+    metric_id = '------------------------------------'
+  logging.critical(str(metric_id) + ' | ' + "{:<7}".format(level) + ' | ' + str(message))
 
 from .models import *
 

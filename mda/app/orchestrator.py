@@ -19,7 +19,7 @@ class Orchestrator():
 
         return aux[0]
         
-    def get_value_orchestrator(self, monitoring_endpoint, metric_name, time):
+    def get_value_orchestrator(self, monitoring_endpoint, metric_id, metric_name, time):
         try:
             osm_headers = {
               "X-Gravitee-Api-Key": OSM_KEY
@@ -32,8 +32,8 @@ class Orchestrator():
             code = response.status_code
             resp = response.text
             if response.status_code != 200:
-                info_log(400, "Request to OSM not sucessful: "+str(code)+" - "+str(resp))
-                #print(f'Error: Request to OSM not successful')
+                #print('orchestrator:get_value_orchestrator -> Request to OSM not successful', flush=True)
+                info_log(metric_id, 'ERROR', 'Error in orchestrator:get_value_orchestrator: Request to OSM not sucessful with code '+str(code)+' - '+str(resp))
                 return "Error"
             json_data = json.loads(resp)
             result = json_data["data"]["result"]
@@ -46,39 +46,37 @@ class Orchestrator():
                     break
                     
             if value == None:
-                info_log(400, 'Erro in request_orchestrator: No values to read')
+                info_log(metric_id, 'INFO', 'Error in orchestrator:get_value_orchestrator: No values to read')
                 return "Error"
             
             try:
                 metric_value = float(value)
             except:
-                info_log(400, 'Erro in request_orchestrator: Value [' + str(value) + '] is an invalid numeric data')
+                info_log(metric_id, 'ERROR', 'Error in orchestrator:get_value_orchestrator: Value [' + str(value) + '] is an invalid numeric data')
                 return "Error"
             
-            info_log(200, f'Response from OSM: {resp}')
+            info_log(metric_id, 'INFO', f'Response from OSM: {resp}')
             
             return metric_value
 
         except Exception as e:
-            print('get_value_orchestrator-> ' + str(e))
-            info_log(400, 'Erro in get_value_orchestrator: ' + str(e))
+            #print('orchestrator:get_value_orchestrator -> ' + str(e), flush=True)
+            info_log(metric_id, 'ERROR', 'Error in orchestrator:get_value_orchestrator: ' + str(e))
             return "Error"
 
     def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, productID, producer, step):
         
         try:
-            metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_name, str(next_run_at).replace(' ', 'T') + 'Z')
+            metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(next_run_at).replace(' ', 'T') + 'Z')
             if metric_value == "Error":
-                #info_log(400, 'Erro in request_orchestrator: get_value_orchestrator invalid')
                 return 0
                 
             if metric_name == "osm_requests":
                 # Read old value
                 sec_to_add = convert_to_seconds(step)
                 old_time = next_run_at - relativedelta(seconds=sec_to_add)
-                old_metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_name, str(old_time).replace(' ', 'T') + 'Z')
+                old_metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(old_time).replace(' ', 'T') + 'Z')
                 if old_metric_value == "Error":
-                    info_log(400, 'Erro in request_orchestrator: get_value_orchestrator invalid')
                     return 0
 
                 #Diff between old value and new value
@@ -109,10 +107,11 @@ class Orchestrator():
                 }
                 data["monitoringData"] = monitoringData
                 send_kafka(data, dataHash, kafka_topic, producer)
-                print('SEND DATA-> '+str(next_run_at)+' -> '+ str(metric_value), flush=True)
+                print('SEND DATA -> '+str(next_run_at)+' -> '+ str(metric_value), flush=True)
+                info_log(metric_id, 'SUCCESS', 'Send data: '+str(next_run_at)+' -> '+ str(metric_value))
             return 1
 
         except Exception as e:
-            print('request_orchestrator-> ' + str(e))
-            info_log(400, 'Erro in request_orchestrator: ' + str(e))
+            #print('orchestrator:request_orchestrator -> ' + str(e), flush=True)
+            info_log(metric_id, 'ERROR', 'Error in orchestrator:request_orchestrator: ' + str(e))
             return 0

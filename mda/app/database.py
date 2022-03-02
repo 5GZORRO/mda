@@ -136,7 +136,8 @@ def add_config(config: Config_Model, orchestrator, aggregator):
       response['metrics'].append(row_m.toString())
     return response
   except Exception as e:
-    print(e)
+    #print('database:add_config -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:add_config: ' + str(e))
     return -1
 
 def get_config(config_id):
@@ -149,7 +150,8 @@ def get_config(config_id):
     [response['metrics'].append(metric.toString()) for metric in metrics]
     return response
   except Exception as e:
-    print(e)
+    #print('database:get_config -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:get_config: ' + str(e))
     return -1
 
 def get_configs():
@@ -163,38 +165,42 @@ def get_configs():
       response.append(add_metrics)
     return response
   except Exception as e:
-    print(e)
+    #print('database:get_configs -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:get_configs: ' + str(e))
     return -1
 
 def delete_metric_queue(metric_id, orchestrator, aggregator):
-
-  index = True
-  while(index):
-    index = False
-    for i in range(len(orchestrator.wait_queue.queue)):
-      if orchestrator.wait_queue.queue[i][4] == metric_id:
-        del orchestrator.wait_queue.queue[i]
-        index = True
-        break
-    for i in range(len(aggregator.wait_queue_agg.queue)):
-      if aggregator.wait_queue_agg.queue[i][4] == metric_id:
-        del aggregator.wait_queue_agg.queue[i]
-        index = True
-        break
-    for i in range(len(orchestrator.metrics_queue.queue)):
-      if orchestrator.metrics_queue.queue[i][4] == metric_id:
-        del orchestrator.metrics_queue.queue[i]
-        index = True
-        break
-    for i in range(len(aggregator.aggregation_queue.queue)):
-      if aggregator.aggregation_queue.queue[i][4] == metric_id:
-        del aggregator.aggregation_queue.queue[i]
-        index = True
-        break
-  return
+  try:
+    index = True
+    while(index):
+      index = False
+      for i in range(len(orchestrator.wait_queue.queue)):
+        if orchestrator.wait_queue.queue[i][4] == metric_id:
+          del orchestrator.wait_queue.queue[i]
+          index = True
+          break
+      for i in range(len(aggregator.wait_queue_agg.queue)):
+        if aggregator.wait_queue_agg.queue[i][4] == metric_id:
+          del aggregator.wait_queue_agg.queue[i]
+          index = True
+          break
+      for i in range(len(orchestrator.metrics_queue.queue)):
+        if orchestrator.metrics_queue.queue[i][4] == metric_id:
+          del orchestrator.metrics_queue.queue[i]
+          index = True
+          break
+      for i in range(len(aggregator.aggregation_queue.queue)):
+        if aggregator.aggregation_queue.queue[i][4] == metric_id:
+          del aggregator.aggregation_queue.queue[i]
+          index = True
+          break
+    return
+  except Exception as e:
+    #print('database:delete_metric_queue -> ' + str(e), flush=True)
+    info_log(metric_id, 'ERROR', 'Error in database:delete_metric_queue: ' + str(e))
+    return -1
 
 def update_config(config_id, config, orchestrator, aggregator):
-
   try:
     row = Config.query.filter_by(_id=config_id).first()
     if row == None:
@@ -237,11 +243,11 @@ def update_config(config_id, config, orchestrator, aggregator):
       return response
     return get_config(config_id)
   except Exception as e:
-    print(e)
+    #print('database:update_config -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:update_config: ' + str(e))
     return -1
 
 def update_next_run(metric_id, next):
-  
   try:
     metric = Metric.query.filter_by(_id=metric_id).first()
     config = Config.query.filter_by(_id=metric.config_id).first()
@@ -254,11 +260,11 @@ def update_next_run(metric_id, next):
     db_session.commit()
     return 1
   except Exception as e:
-    print("update_next_run: " + str(e))
+    #print('database:update_next_run -> ' + str(e), flush=True)
+    info_log(metric_id, 'ERROR', 'Error in database:update_next_run: ' + str(e))
     return -1
 
 def update_aggregation(metric_id, next):
-  
   try:
     metric = Metric.query.filter_by(_id=metric_id).first()
     config = Config.query.filter_by(_id=metric.config_id).first()
@@ -271,11 +277,11 @@ def update_aggregation(metric_id, next):
     db_session.commit()
     return 1
   except Exception as e:
-    print("update_aggregation: " + str(e))
+    #print('database:update_aggregation -> ' + str(e), flush=True)
+    info_log(metric_id, 'ERROR', 'Error in database:update_aggregation: ' + str(e))
     return -1
 
 def enable_config(config_id, orchestrator, aggregator):
-
   try:
     config = Config.query.filter_by(_id=config_id).first()
     if config == None or (config.timestamp_end != None and config.timestamp_end < datetime.datetime.now()):
@@ -299,11 +305,11 @@ def enable_config(config_id, orchestrator, aggregator):
       db_session.commit()
     return add_metrics
   except Exception as e:
-    print(e)
+    #print('database:enable_config -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:enable_config: ' + str(e))
     return -1
 
 def disable_config(config_id, orchestrator, aggregator):
-
   try:
     config = Config.query.filter_by(_id=config_id).first()
     if config == None:
@@ -323,11 +329,11 @@ def disable_config(config_id, orchestrator, aggregator):
     db_session.commit()
     return add_metrics
   except Exception as e:
-    print(e)
+    #print('database:disable_config -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:disable_config: ' + str(e))
     return -1
 
 def delete_config(config_id, orchestrator, aggregator):
-
   try:
     config = Config.query.filter_by(_id=config_id).first()
     if config == None:
@@ -342,11 +348,11 @@ def delete_config(config_id, orchestrator, aggregator):
     db_session.commit()
     return 1
   except Exception as e:
-    print(e)
+    #print('database:delete_config -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:delete_config: ' + str(e))
     return -1
 
 def load_database_metrics(orchestrator, aggregator):
-
   try:
     # Update old metrics and next executions
     now = datetime.datetime.now()
@@ -373,7 +379,8 @@ def load_database_metrics(orchestrator, aggregator):
         aggregator.wait_queue_agg.put((row['next_aggregation'], row['timestamp_start'], row['step'], row['timestamp_end'], row['_id'], row['metric_name'], row['metric_type'], row['aggregation_method'], row['transaction_id'], row['kafka_topic'], row['network_slice_id'], row['tenant_id'], row['resource_id'], row['step_aggregation'], row['next_aggregation'], row['instance_id'], row['product_id']))
     return 1
   except Exception as e:
-    print(e)
+    #print('database:load_database_metrics -> ' + str(e), flush=True)
+    info_log(None, 'ERROR', 'Error in database:load_database_metrics: ' + str(e))
     return -1
 
 def insert_metric_value(metric_id, metric_value, timestamp):
@@ -384,35 +391,37 @@ def insert_metric_value(metric_id, metric_value, timestamp):
     db_session.commit()
     return 1
   except Exception as e:
-    print(e)
+    #print('database:insert_metric_value -> ' + str(e), flush=True)
+    info_log(metric_id, 'ERROR', 'Error in database:insert_metric_value: ' + str(e))
     return -1
 
 def get_last_aggregation(metric_id, aggregation_method, bucket, step_aggregation):
-
-  where_condition = "WHERE metric_id = '"+str(metric_id)+"' and timestamp < '"+str(bucket)+"'::timestamp and " \
-                          "timestamp >= ('"+str(bucket)+"'::timestamp - interval '"+str(step_aggregation)+"');"
-                          
-  result = db_session.execute("SELECT "+aggregation_method+"(metric_value) " \
-                              "FROM value " + where_condition).fetchone()
-  
-  # Delete old data
-  db_session.execute("DELETE FROM value " + where_condition)
-  
-  return result[0]
+  try:
+    where_condition = "WHERE metric_id = '"+str(metric_id)+"' and timestamp < '"+str(bucket)+"'::timestamp and " \
+                            "timestamp >= ('"+str(bucket)+"'::timestamp - interval '"+str(step_aggregation)+"');"
+                            
+    result = db_session.execute("SELECT "+aggregation_method+"(metric_value) " \
+                                "FROM value " + where_condition).fetchone()
+    
+    # Delete old data
+    db_session.execute("DELETE FROM value " + where_condition)
+    
+    return result[0]
+  except Exception as e:
+    #print('database:get_last_aggregation -> ' + str(e), flush=True)
+    info_log(metric_id, 'ERROR', 'Error in database:get_last_aggregation: ' + str(e))
+    return -1
 
 def create_index():
-
   db_session.execute("CREATE INDEX value_index ON value (timestamp ASC, metric_id);")
   db_session.commit()
   return
 
 def close_connection():
-
   db_session.remove()
   return
   
 def reload_connection():
-
   db_session.remove()
   db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
   return
@@ -425,12 +434,12 @@ if RESET_DB.lower() == 'true':
       db_session.commit()
       Base.metadata.drop_all(bind=engine)
     except Exception as e:
-      print(e)
+      print('database:reset_db -> ' + str(e), flush=True)
     Base.metadata.create_all(bind=engine)
     db_session.commit()
     create_index()
   except Exception as e:
-    print(e)
+    print('database:exception_reset_db -> ' + str(e), flush=True)
     sys.exit(0)
 
 # Create db if not exists
@@ -446,5 +455,5 @@ except Exception as e:
     db_session.commit()
     create_index()
   except Exception as e:
-    print(e)
+    print('database:create_db -> ' + str(e), flush=True)
     sys.exit(0)

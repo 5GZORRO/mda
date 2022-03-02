@@ -40,7 +40,7 @@ async def set_param(config: Config_Model):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in create config in database."})
   orchestrator.update_queue_flag = True
   aggregator.update_queue_flag_agg = True
-  info_log(200, f'Monitoring spec successfully created by operator {config.tenant_id}')
+  info_log(None, 'SUCCESS', f'Monitoring spec successfully created by operator {config.tenant_id}')
   return resp
 
 @app.get("/settings/{config_id}", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
@@ -80,7 +80,7 @@ async def update_config_id(config_id, config: Update_Config_Model):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in update config in database."})
   orchestrator.update_queue_flag = True
   aggregator.update_queue_flag_agg = True
-  info_log(200, f'Monitoring spec {config_id} successfully updated')
+  info_log(None, 'SUCCESS', f'Monitoring spec {config_id} successfully updated')
   return resp
 
 @app.put("/settings/{config_id}/enable", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_enable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
@@ -98,7 +98,7 @@ async def enable_config_id(config_id):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in enable config in database."})
   orchestrator.update_queue_flag = True
   aggregator.update_queue_flag_agg = True
-  info_log(200, f'Monitoring spec {config_id} successfully enabled')
+  info_log(None, 'SUCCESS', f'Monitoring spec {config_id} successfully enabled')
   return resp
 
 @app.put("/settings/{config_id}/disable", responses={200: {"model": Response_Config_Model, "content": {"application/json": { "example": json_response_disable}}}, 404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
@@ -116,7 +116,7 @@ async def disable_config_id(config_id):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in disable config in database."})
   orchestrator.update_queue_flag = True
   aggregator.update_queue_flag_agg = True
-  info_log(200, f'Monitoring spec {config_id} successfully disabled')
+  info_log(None, 'SUCCESS', f'Monitoring spec {config_id} successfully disabled')
   return resp
 
 @app.delete("/settings/{config_id}", status_code=HTTP_204_NO_CONTENT, responses={404: {"model": Response_Error_Model, "content": {"application/json": { "example": {"status": "Error", "message": "Error message."}}}}})
@@ -132,6 +132,6 @@ async def delete_config_id(config_id):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in delete config in database."})
   orchestrator.update_queue_flag = True
   aggregator.update_queue_flag_agg = True
-  info_log(200, f'Monitoring spec {config_id} successfully deleted')
+  info_log(None, 'SUCCESS', f'Monitoring spec {config_id} successfully deleted')
 
   return Response(status_code=HTTP_204_NO_CONTENT)
