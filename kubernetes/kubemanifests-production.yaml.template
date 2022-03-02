@@ -1,0 +1,195 @@
+apiVersion: v1
+items:
+
+  # services
+  # mda
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        io.kompose.service: mda
+      name: mda
+      namespace: {{NAMESPACE}}
+    spec:
+      type: NodePort
+      ports:
+        - name: "4000"
+          port: 4000
+          targetPort: 4000
+          nodePort: {{MDA_NODEPORT}}
+      selector:
+        io.kompose.service: mda
+    status:
+      loadBalancer: {}
+
+  # postgres
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        io.kompose.service: postgres-mda
+      name: postgres-mda
+      namespace: {{NAMESPACE}}
+    spec:
+      type: NodePort
+      ports:
+        - name: "5432"
+          port: 5432
+          targetPort: 5432
+          nodePort: {{POSTGRES_NODEPORT}}
+      selector:
+        io.kompose.service: postgres-mda
+    status:
+      loadBalancer: {}
+
+  # deployments
+  # mda
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        io.kompose.service: mda
+      name: mda
+      namespace: {{NAMESPACE}}
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: mda
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            io.kompose.service: mda
+        spec:
+          containers:
+            - name: mda
+              envFrom:
+              - secretRef:
+                  name: env-file-mda
+              image: docker.pkg.github.com/5gzorro/mda/mda_production:latest
+              ports:
+                - containerPort: 4000
+              resources: {}
+              volumeMounts:
+                - mountPath: /logs
+                  name: mda-claim0
+          imagePullSecrets:
+            - name: regcred-mda
+          volumes:
+            - name: mda-claim0
+              persistentVolumeClaim:
+                claimName: mda-claim0
+          restartPolicy: Always
+    status: {}
+
+  # postgres
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        io.kompose.service: postgres-mda
+      name: postgres-mda
+      namespace: {{NAMESPACE}}
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: postgres-mda
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            io.kompose.service: postgres-mda
+        spec:
+          containers:
+            - name: mda-bd
+              envFrom:
+              - secretRef:
+                  name: env-file-mda
+              image: postgres
+              ports:
+                - containerPort: 5432
+              resources: {}
+              volumeMounts:
+                - mountPath: /var/lib/postgresql/data
+                  name: mda-postgres-claim0
+          volumes:
+            - name: mda-postgres-claim0
+              persistentVolumeClaim:
+                claimName: mda-postgres-claim0
+          restartPolicy: Always
+    status: {}
+
+  # persistent volume
+  # postgres
+  - apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: mda-postgres-{{NAMESPACE}}
+      labels:
+        type: local
+    spec:
+      storageClassName: manual
+      capacity:
+        storage: 100Mi
+      accessModes:
+        - ReadWriteOnce
+      hostPath:
+        path: "/mnt/mda/{{NAMESPACE}}/postgres"
+
+  # mda
+  - apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: mda-{{NAMESPACE}}
+      labels:
+        type: local
+    spec:
+      storageClassName: manual
+      capacity:
+        storage: 100Mi
+      accessModes:
+        - ReadWriteOnce
+      hostPath:
+        path: "/mnt/mda/{{NAMESPACE}}/logs"
+
+  # persistent volume claim
+  # postgres
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        io.kompose.service: mda-postgres-claim0
+      name: mda-postgres-claim0
+      namespace: {{NAMESPACE}}
+    spec:
+      storageClassName: manual
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+
+  # mda
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        io.kompose.service: mda-claim0
+      name: mda-claim0
+      namespace: {{NAMESPACE}}
+    spec:
+      storageClassName: manual
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+
+kind: List
+metadata: {}

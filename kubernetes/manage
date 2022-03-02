@@ -1,0 +1,188 @@
+#!/bin/bash
+
+# usage command
+usage() {
+case "$1" in
+    apply)
+    cat <<-EOF
+Usage: $0 apply [flags]
+Flags:
+  -e|--env-file         Environment filename
+  -u|--docker-username  Username for Docker registry authentication
+  -p|--docker-password  Password for Docker registry authentication
+
+EOF
+  exit
+    ;;
+    delete)
+    cat <<-EOF
+Usage: $0 delete [flags]
+Flags:
+  -n|--namespace        Kubernets namespace
+
+EOF
+  exit
+    ;;
+    *)
+    cat <<-EOF
+Usage: $0 [command] [flags]
+Commands:
+  apply                 Apply a configuration to a resource by filename
+  delete                Delete resources by filenames
+
+EOF
+  exit
+    ;;
+esac
+}
+
+# clear if errors
+clear_env() {
+  `kubectl delete secret env-file-mda --namespace="$NAMESPACE" 2>/dev/null`
+  exit
+}
+
+# build configuration file by secrets
+build_configuration() {
+  # read arguments
+  for arg in "$@"
+  do
+      case $arg in
+          #-f|--file)
+          #FILE="$2"
+          #shift
+          #;;
+          -e|--env-file)
+          ENV_FILE="$2"
+          shift
+          ;;
+          -u|--docker-username)
+          USERNAME="$2"
+          shift
+          ;;
+          -p|--docker-password)
+          PASSWORD="$2"
+          shift
+          ;;
+          -*)
+          usage "$COMMAND"
+          ;;
+          *)
+          shift
+          ;;
+      esac
+  done
+  
+  # check arguments
+  #if [ -z "$FILE" ]; then
+  #  echo "ERROR: Configuration file missing!"
+  #  exit
+  #fi
+  
+  if [ -z "$ENV_FILE" ]; then
+    echo "ERROR: Environment file missing!"
+    exit
+  fi
+  
+  if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+    echo "ERROR: Docker username ou password missing!"
+    exit
+  fi
+    
+  # read configuration template
+  #config_file=`cat "$FILE" 2>/dev/null` || true
+  kubernetes_dir=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+  config_file=`cat "$kubernetes_dir"/kubemanifests-production.yaml.template 2>/dev/null` || true
+  if [ -z "$config_file" ]; then
+    echo "ERROR: Configuration file not found!"
+    exit
+  fi
+  
+  # read environment variables from kubernets secrets and replace in configuration file
+  NAMESPACE=`grep NAMESPACE "$ENV_FILE" | awk -F= '{print $2}'`
+  if [ ! -z "$NAMESPACE" ]; then
+    config_file=`echo "$config_file" | sed "s/{{NAMESPACE}}/$NAMESPACE/g"`
+  else
+    echo "ERROR: Namespace not found in secrets!"
+    exit
+  fi
+  
+  MDA_NODEPORT=`grep MDA_NODEPORT "$ENV_FILE" | awk -F= '{print $2}'`
+  if [ ! -z "$MDA_NODEPORT" ]; then
+    config_file=`echo "$config_file" | sed "s/{{MDA_NODEPORT}}/$MDA_NODEPORT/g"`
+  else
+    echo "ERROR: MDA nodePort not found in secrets!"
+    exit
+  fi
+  
+  POSTGRES_NODEPORT=`grep POSTGRES_NODEPORT "$ENV_FILE" | awk -F= '{print $2}'`
+  if [ ! -z "$POSTGRES_NODEPORT" ]; then
+    config_file=`echo "$config_file" | sed "s/{{POSTGRES_NODEPORT}}/$POSTGRES_NODEPORT/g"`
+  else
+    config_file=`echo "$config_file" | sed "/{{POSTGRES_NODEPORT}}/d"`
+  fi
+  
+  # create secrets
+    `echo kubectl create secret generic env-file-mda --namespace="$NAMESPACE" --from-env-file="$ENV_FILE"` || exit
+    `echo kubectl create secret docker-registry regcred-mda --namespace="$NAMESPACE" --docker-server=docker.pkg.github.com --docker-username="$USERNAME" --docker-password="$PASSWORD"` || clear_env
+}
+
+# read delete flags
+build_delete() {
+  # read arguments
+  for arg in "$@"
+  do
+      case $arg in
+          -n|--namespace)
+          NAMESPACE="$2"
+          shift
+          ;;
+          -*)
+          usage "$COMMAND"
+          ;;
+          *)
+          shift
+          ;;
+      esac
+  done
+  
+  # check arguments
+  if [ -z "$NAMESPACE" ]; then
+    echo "ERROR: Namespace missing!"
+    exit
+  fi
+}
+
+# =================================================================================================================
+# run commands
+COMMAND="$1"
+case "${COMMAND}" in
+  apply)
+    build_configuration "$@"
+    # run configurations
+    #echo "$config_file"
+    echo "$config_file" | kubectl apply -f -
+    if [ ! $? -eq 0 ]; then
+      # delete configurations and secrets
+      `echo kubectl delete deployments mda postgres-mda --namespace="$NAMESPACE" 2>/dev/null`
+      `echo kubectl delete services mda postgres-mda --namespace="$NAMESPACE" 2>/dev/null`
+      `echo kubectl delete pvc mda-claim0 mda-postgres-claim0 --namespace="$NAMESPACE" 2>/dev/null`
+      `echo kubectl delete pv mda-"$NAMESPACE" mda-postgres-"$NAMESPACE" 2>/dev/null`
+      `echo kubectl delete secret env-file-mda regcred-mda --namespace="$NAMESPACE" 2>/dev/null`
+    fi
+    exit
+    ;;
+  delete)
+    build_delete "$@"
+    # delete configurations and secrets
+    `echo kubectl delete deployments mda postgres-mda --namespace="$NAMESPACE"`
+    `echo kubectl delete services mda postgres-mda --namespace="$NAMESPACE"`
+    `echo kubectl delete pvc mda-claim0 mda-postgres-claim0 --namespace="$NAMESPACE"`
+    `echo kubectl delete pv mda-"$NAMESPACE" mda-postgres-"$NAMESPACE"`
+    `echo kubectl delete secret env-file-mda regcred-mda --namespace="$NAMESPACE"`
+    exit
+    ;;
+  *)
+    usage ""
+    ;;
+esac

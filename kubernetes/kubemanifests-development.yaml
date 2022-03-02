@@ -239,7 +239,7 @@ items:
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/mda/postgres"
+        path: "/mnt/mda/development/postgres"
 
   # mda
   - apiVersion: v1
@@ -255,6 +255,6 @@ items:
       accessModes:
         - ReadWriteOnce
       hostPath:
-        path: "/mnt/mda/logs"
+        path: "/mnt/mda/development/logs"
 kind: List
 metadata: {}
