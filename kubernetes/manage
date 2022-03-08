@@ -27,8 +27,8 @@ EOF
     cat <<-EOF
 Usage: $0 [command] [flags]
 Commands:
-  apply                 Apply a configuration to a resource by filename
-  delete                Delete resources by filenames
+  apply                 Deploy MDA components by specific configuration
+  delete                Delete resources in a specific domain
 
 EOF
   exit
