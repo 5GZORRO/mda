@@ -31,6 +31,7 @@ We provide a confluence page available online describing the intended full pipel
 
 ### Deployment Instructions
 This section covers all the requirements a developer may have to deploy the MDA component.
+> :warning: **If you need to implement MDA components by operator, follow the documentation ["Deploy MDA by operator"](https://github.com/5GZORRO/mda/wiki/Deploy-MDA-per-Operator)!**
 
 #### Prerequisites
 To run this component in production, the following actions are needed:
