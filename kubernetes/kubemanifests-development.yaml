@@ -180,9 +180,6 @@ items:
         spec:
           containers:
             - name: dummy-osm-mda
-              envFrom:
-              - secretRef:
-                  name: env-file-mda
               image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
               ports:
                 - containerPort: 4500

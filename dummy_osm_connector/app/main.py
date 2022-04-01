@@ -8,8 +8,8 @@ import random, requests, os
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 
-MIN_AVAILABILITY = os.environ["MIN_AVAILABILITY"]
-MAX_AVAILABILITY = os.environ["MAX_AVAILABILITY"]
+MIN_AVAILABILITY=0.90
+MAX_AVAILABILITY=0.99
 
 initial_value = 0.95
 time_now = datetime.now()

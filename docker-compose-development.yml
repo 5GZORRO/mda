@@ -16,8 +16,6 @@ services:
   dummy_osm_mda:
     #image: docker.pkg.github.com/5gzorro/mda/osm_dummy:latest
     build: ./dummy_osm_connector
-    env_file:
-      - ./dummy_osm_connector/.env
     ports:
       - "4500:4500"
     expose:
