@@ -1,12 +1,11 @@
 apiVersion: v1
 items:
+
+  # services
+  # mda
   - apiVersion: v1
     kind: Service
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: mda
       name: mda
@@ -21,13 +20,11 @@ items:
         io.kompose.service: mda
     status:
       loadBalancer: {}
+      
+  # postgres
   - apiVersion: v1
     kind: Service
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: postgres-mda
       name: postgres-mda
@@ -42,13 +39,11 @@ items:
         io.kompose.service: postgres-mda
     status:
       loadBalancer: {}
+      
+  # dummy-osm
   - apiVersion: v1
     kind: Service
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: dummy-osm-mda
       name: dummy-osm-mda
@@ -63,13 +58,12 @@ items:
         io.kompose.service: dummy-osm-mda
     status:
       loadBalancer: {}
+      
+  # deployments
+  # mda
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: mda
       name: mda
@@ -82,10 +76,6 @@ items:
         type: Recreate
       template:
         metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-            kompose.version: 1.22.0 (955b78124)
-          creationTimestamp: null
           labels:
             io.kompose.service: mda
         spec:
@@ -109,13 +99,11 @@ items:
               persistentVolumeClaim:
                 claimName: mda-claim0
     status: {}
+    
+  # postgres
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: postgres-mda
       name: postgres-mda
@@ -128,10 +116,6 @@ items:
         type: Recreate
       template:
         metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-            kompose.version: 1.22.0 (955b78124)
-          creationTimestamp: null
           labels:
             io.kompose.service: postgres-mda
         spec:
@@ -153,13 +137,11 @@ items:
               persistentVolumeClaim:
                 claimName: mda-postgres-claim0
     status: {}
+    
+  # dummy-osm
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
         io.kompose.service: dummy-osm-mda
       name: dummy-osm-mda
@@ -171,10 +153,6 @@ items:
       strategy: {}
       template:
         metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-development.yml -o kubemanifests-development.yaml
-            kompose.version: 1.22.0 (955b78124)
-          creationTimestamp: null
           labels:
             io.kompose.service: dummy-osm-mda
         spec:
@@ -189,10 +167,11 @@ items:
           restartPolicy: Always
     status: {}
 
+  # persistent volume
+  # postgres
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: mda-postgres-claim0
       name: mda-postgres-claim0
@@ -205,10 +184,10 @@ items:
           storage: 100Mi
     status: {}
 
+  # mda
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: mda-claim0
       name: mda-claim0
