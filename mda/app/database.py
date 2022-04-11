@@ -342,6 +342,7 @@ def delete_config(config_id, orchestrator, aggregator):
 
     for metric in metrics:
       delete_metric_queue(metric._id, orchestrator, aggregator)
+      values = Value.query.filter_by(metric_id=metric._id).delete()
       db_session.delete(metric)
       
     db_session.delete(config)
