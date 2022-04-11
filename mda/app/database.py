@@ -1,6 +1,6 @@
 from .main import *
 
-engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PASSWORD + '@' + POSTGRES_HOST + ':' + POSTGRES_PORT + '/' + POSTGRES_DB, pool_size=num_fetch_threads+num_fetch_threads_agg, convert_unicode=True, pool_pre_ping=True)
+engine = create_engine('postgresql+psycopg2://' + POSTGRES_USER + ':' + POSTGRES_PASSWORD + '@' + POSTGRES_HOST + ':' + POSTGRES_PORT + '/' + POSTGRES_DB, pool_size=num_fetch_threads+num_fetch_threads_agg, convert_unicode=True)
 # Create database if it does not exist.
 if not database_exists(engine.url):
   create_database(engine.url)
@@ -342,8 +342,9 @@ def delete_config(config_id, orchestrator, aggregator):
 
     for metric in metrics:
       delete_metric_queue(metric._id, orchestrator, aggregator)
-      values = Value.query.filter_by(metric_id=metric._id).delete()
+      Value.query.filter_by(metric_id=metric._id).delete()
       db_session.delete(metric)
+      db_session.commit()
       
     db_session.delete(config)
     db_session.commit()
