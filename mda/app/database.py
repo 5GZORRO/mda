@@ -25,7 +25,7 @@ class Config(Base):
   timestamp_start = Column(DateTime, nullable=False)
   timestamp_end = Column(DateTime, nullable=True)
   status = Column(Integer, default=1)
-  metrics = relationship("Metric")
+  metrics = relationship("Metric", cascade="all, delete")
 
   def __init__(self, transaction_id, kafka_topic, network_slice_id, timestamp_start, timestamp_end, tenant_id, resource_id, parent_id, monitoring_endpoint, instance_id, product_id):
     self.transaction_id  = transaction_id
@@ -338,14 +338,11 @@ def delete_config(config_id, orchestrator, aggregator):
     config = Config.query.filter_by(_id=config_id).first()
     if config == None:
       return 0
+    
     metrics = Metric.query.filter_by(config_id=config._id).all()
-
     for metric in metrics:
       delete_metric_queue(metric._id, orchestrator, aggregator)
-      Value.query.filter_by(metric_id=metric._id).delete()
-      db_session.delete(metric)
-      db_session.commit()
-      
+    
     db_session.delete(config)
     db_session.commit()
     return 1
