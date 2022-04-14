@@ -82,6 +82,7 @@ items:
           containers:
             - name: mda
               image: docker.pkg.github.com/5gzorro/mda/mda_production:latest
+              imagePullPolicy: "Always"
               envFrom:
               - secretRef:
                   name: env-file-mda
