@@ -30,7 +30,7 @@ $ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github
 
 ## Configuration
 
-> :warning: *For a Development stage enviroment configuration, follow the documentation "Development Environment Configuration"!*
+> :warning: *For a Development stage enviroment configuration, follow the documentation ["Development Environment Configuration"](https://github.com/5GZORRO/mda/wiki/Development-Environment-Configuration)!*
 
 ### Pipeline Description
 
@@ -42,7 +42,7 @@ We provide a confluence page available online describing the intended full pipel
 
 ### Deployment Instructions
 This section covers all the requirements a developer may have to deploy the MDA component.
-> :warning: *If you need to implement MDA components by operator, follow the documentation "Deploy MDA by operator"!*
+> :warning: *If you need to implement MDA components by operator, follow the documentation ["Deploy MDA by operator"](https://github.com/5GZORRO/mda/wiki/Deploy-MDA-per-Operator)!*
 
 #### Deploy components
  
