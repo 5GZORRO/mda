@@ -76,7 +76,7 @@ In case MDA goes down when the reload occurs, it's standard to have some data lo
 ## API Reference
 The following table displays the available endpoints:
 
-*Endpoint**|**Description**|**Method*
+**Endpoint**|**Description**|**Method**
 |:----|:----|:----
 `http://<IP>:<MDA_PORT>/settings`|Enable and send the monitoring spec with the dynamic config variables|POST
 `http://<IP>:<MDA_PORT>/settings/:id/enable`|Enable a certain monitoring spec|PUT
