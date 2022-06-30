@@ -22,7 +22,9 @@ To run this component in production, the following actions are needed:
 * Create a ".env" environment variable file from the template.
 * Deployment in a production environment uses a github component package. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
 
-```$ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com```
+```python
+$ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
+```
 
 *Note:* If it is required to utilize the personal access token and you do not possess that feature, you can see here:
 
@@ -47,26 +49,36 @@ This section covers all the requirements a developer may have to deploy the MDA 
 ##### Deploy in Docker
 To build and up the container we have:
 
-```$ docker-compose -f docker-compose-production.yml up --build```
+```python
+$ docker-compose -f docker-compose-production.yml up --build
+```
 
 To stop the services, we can do:
 
-```$ docker-compose -f docker-compose-production.yml down```
+```python
+$ docker-compose -f docker-compose-production.yml down
+```
 
 
 ##### Deploy in Kubernetes
 To run the Kubernetes component, we first need to create secret kubernetes with the environment variables. To do so use the following command:
 
-```$ kubectl create secret generic env-file --from-env-file=.env```
+```python
+$ kubectl create secret generic env-file --from-env-file=.env
+```
 
 Then, to run the service we can use:
 
-```$ kubectl apply -f kubemanifests-production.yaml```
+```python
+$ kubectl apply -f kubemanifests-production.yaml
+```
 
 To stop services and clear secrets, do:
 
-```$ kubectl delete -f kubemanifests-production.yaml```
-```$ kubectl delete secret env-file```
+```python
+$ kubectl delete -f kubemanifests-production.yaml
+$ kubectl delete secret env-file
+```
 
 
 ### Persistence detail
