@@ -5,7 +5,7 @@ async def set_param(config: Config_Model):
 
   config.data_source_type = config.data_source_type.upper()
   if config.data_source_type not in resources_options:
-      return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
+      return JSONResponse(status_code=404, content={"status": "Error", "message": "Resources options are "+str(resources_options)+"."})
   if config.timestamp_start == None:
     config.timestamp_start = datetime.datetime.now()
   elif config.timestamp_start < datetime.datetime.now():
@@ -14,18 +14,18 @@ async def set_param(config: Config_Model):
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Timestamp start has to be after timestamp end."})
   for metric in config.metrics:
     if metric.step[-1] not in step_options:
-      return JSONResponse(status_code=404, content={"status": "Error", "message": "Step options is "+str(step_options)+"."})
+      return JSONResponse(status_code=404, content={"status": "Error", "message": "Step options are "+str(step_options)+"."})
     #Aggregation params
     if metric.aggregation_method != None or metric.step_aggregation != None:
       if metric.aggregation_method != None:
         metric.aggregation_method = metric.aggregation_method.upper()
         if metric.aggregation_method not in agg_options:
-          return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options is "+str(agg_options)+"."})
+          return JSONResponse(status_code=404, content={"status": "Error", "message": "Aggregation step options are "+str(agg_options)+"."})
       else:
         return JSONResponse(status_code=404, content={"status": "Error", "message": "For aggregation we need the aggregation_method defined."})
       if metric.step_aggregation != None:
         if metric.step_aggregation[-1] not in step_options:
-          return JSONResponse(status_code=404, content={"status": "Error", "message": "Step aggregation options is "+str(step_options)+"."})
+          return JSONResponse(status_code=404, content={"status": "Error", "message": "Step aggregation options are "+str(step_options)+"."})
       else:
         return JSONResponse(status_code=404, content={"status": "Error", "message": "For aggregation we need the step_aggregation defined."})
     
