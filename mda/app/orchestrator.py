@@ -108,7 +108,7 @@ class Orchestrator():
                     "networkID" : networkID
                 }
                 data["monitoringData"] = monitoringData
-                send_kafka(data, dataHash, kafka_topic, producer)
+                send_kafka(metric_id, data, dataHash, kafka_topic, producer)
                 print('SEND DATA -> '+str(next_run_at)+' -> '+ str(metric_value), flush=True)
                 info_log(metric_id, 'SUCCESS', 'Send data: '+str(next_run_at)+' -> '+ str(metric_value))
             return 1
