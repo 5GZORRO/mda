@@ -19,7 +19,7 @@ class Orchestrator():
 
         return aux[0]
         
-    def get_value_orchestrator(self, monitoring_endpoint, metric_id, metric_name, time):
+    def get_value_orchestrator(self, monitoring_endpoint, metric_id, metric_name, time, network_id):
         try:
             osm_headers = {
               "X-Gravitee-Api-Key": OSM_KEY
@@ -41,7 +41,9 @@ class Orchestrator():
             # Search metric value by network_slice_id
             value = None
             for result in json_data['data']['result']:
-                if result['metric']['ns_id'] == '15cce067-4818-4afc-b0f8-0e4a1babf753':
+                if 'ns_id' not in result['metric']:
+                    value = result['value'][1]
+                elif result['metric']['ns_id'] == str(network_id):
                     value = result['value'][1]
                     break
                     
@@ -67,7 +69,7 @@ class Orchestrator():
     def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, productID, producer, step):
         
         try:
-            metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(next_run_at).replace(' ', 'T') + 'Z')
+            metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(next_run_at).replace(' ', 'T') + 'Z', networkID)
             if metric_value == "Error":
                 return 0
                 
