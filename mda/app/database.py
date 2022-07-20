@@ -338,6 +338,8 @@ def delete_config(config_id, orchestrator, aggregator):
     config = Config.query.filter_by(_id=config_id).first()
     if config == None:
       return 0
+    if config.status == 1:
+      return 2
     
     metrics = Metric.query.filter_by(config_id=config._id).all()
     for metric in metrics:

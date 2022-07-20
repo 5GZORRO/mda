@@ -128,6 +128,8 @@ async def delete_config_id(config_id):
   resp = delete_config(config_id, orchestrator, aggregator)
   if resp == 0:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Config id invalid."})
+  if resp == 2:
+    return JSONResponse(status_code=404, content={"status": "Error", "message": "Config is enable. If you have already disabled the config, wait a minute and try again."})
   if resp == -1:
     return JSONResponse(status_code=404, content={"status": "Error", "message": "Error in delete config in database."})
   orchestrator.update_queue_flag = True
