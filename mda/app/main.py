@@ -55,7 +55,7 @@ json_response_enable = {"id": "ed7683f1-b625-4b41-a32d-3e690c4c6740", "created_a
 json_response_disable = json_response_enable.copy()
 json_response_disable['status'] = 0
 
-resources_options = ['OSM']
+resources_options = ['OSM', 'RAN']
 agg_options = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'STDDEV']
 step_options = ['s', 'm', 'h', 'd', 'w']
 

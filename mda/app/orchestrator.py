@@ -19,7 +19,7 @@ class Orchestrator():
 
         return aux[0]
         
-    def get_value_orchestrator(self, monitoring_endpoint, metric_id, metric_name, time, network_id):
+    def get_value_orchestrator(self, monitoring_endpoint, metric_id, metric_name, time, network_id, resource_id):
         try:
             osm_headers = {
               "X-Gravitee-Api-Key": OSM_KEY
@@ -38,14 +38,17 @@ class Orchestrator():
             json_data = json.loads(resp)
             result = json_data["data"]["result"]
             
-            # Search metric value by network_slice_id
+            # Search metric value by network_slice_id or cell_id
             value = None
             for result in json_data['data']['result']:
-                if 'ns_id' not in result['metric']:
-                    value = result['value'][1]
-                elif result['metric']['ns_id'] == str(network_id):
-                    value = result['value'][1]
-                    break
+              if 'ns_id' in result['metric'] and result['metric']['ns_id'] == str(network_id):
+                value = result['value'][1]
+                break
+            elif 'cell_id' in result['metric'] and result['metric']['cell_id'] == str(resource_id):
+                value = result['value'][1]
+                break
+            else:
+                value = result['value'][1]
                     
             if value == None:
                 info_log(metric_id, 'INFO', 'Error in orchestrator:get_value_orchestrator: No values to read')
@@ -69,7 +72,7 @@ class Orchestrator():
     def request_orchestrator(self, metric_name, resourceID, next_run_at, tenantID, transactionID, networkID, kafka_topic, aggregation, metric_id, monitoring_endpoint, instanceID, productID, producer, step):
         
         try:
-            metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(next_run_at).replace(' ', 'T') + 'Z', networkID)
+            metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(next_run_at).replace(' ', 'T') + 'Z', networkID, resourceID)
             if metric_value == "Error":
                 return 0
                 
