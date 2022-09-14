@@ -47,7 +47,7 @@ class Orchestrator():
               elif 'cell_id' in result['metric'] and result['metric']['cell_id'] == str(resource_id):
                 value = result['value'][1]
                 break
-              else:
+              elif 'ns_id' not in result['metric'] and 'cell_id' not in result['metric']:
                 value = result['value'][1]
                     
             if value == None:
