@@ -44,10 +44,10 @@ class Orchestrator():
               if 'ns_id' in result['metric'] and result['metric']['ns_id'] == str(network_id):
                 value = result['value'][1]
                 break
-            elif 'cell_id' in result['metric'] and result['metric']['cell_id'] == str(resource_id):
+              elif 'cell_id' in result['metric'] and result['metric']['cell_id'] == str(resource_id):
                 value = result['value'][1]
                 break
-            else:
+              else:
                 value = result['value'][1]
                     
             if value == None:
@@ -80,7 +80,7 @@ class Orchestrator():
                 # Read old value
                 sec_to_add = convert_to_seconds(step)
                 old_time = next_run_at - relativedelta(seconds=sec_to_add)
-                old_metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(old_time).replace(' ', 'T') + 'Z')
+                old_metric_value = self.get_value_orchestrator(monitoring_endpoint, metric_id, metric_name, str(old_time).replace(' ', 'T') + 'Z', networkID, resourceID)
                 if old_metric_value == "Error":
                     return 0
 
