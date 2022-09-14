@@ -113,6 +113,15 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
               "project_id": str(i)+"b0d7475-319f-48ce-a216-92b85f7800a8",
               "vdu_name": "test-"+str(i)+"-mgmtVM-0",
               "vnf_member_index": str(i)
+          }                    
+      }
+      
+      json_metric_ran = {
+          "metric": {
+              "__name__" : query,
+              "job" : "amarisoft",
+              "instance" : "0.0.0.0:8000",
+              "cell_id": str(i)+"5cce067-4818-4afc-b0f8-0e4a1babf753"
           }
       }
     
@@ -127,6 +136,10 @@ async def query(time: datetime, query: str, X_Gravitee_Api_Key: str = Header(Non
       elif query == "up":
           json_metric['value'] = [datetime.timestamp(time), "1"]
           response['data']['result'].append(json_metric)
+      
+      elif query == "cell_ul_bitrate_bps":
+          json_metric_ran['value'] = [datetime.timestamp(time), str(round(random.uniform(0,1),2))]
+          response['data']['result'].append(json_metric_ran)
   
       elif query == "error":
           json_metric['value'] = [datetime.timestamp(time), "string"]
