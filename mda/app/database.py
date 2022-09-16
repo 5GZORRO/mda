@@ -406,6 +406,7 @@ def get_last_aggregation(metric_id, aggregation_method, bucket, step_aggregation
     
     # Delete old data
     db_session.execute("DELETE FROM value " + where_condition)
+    db_session.commit()
     
     return result[0]
   except Exception as e:
